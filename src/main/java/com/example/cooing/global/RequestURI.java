@@ -1,4 +1,4 @@
-package com.example.cooing;
+package com.example.cooing.global;
 
 public class RequestURI {
 
