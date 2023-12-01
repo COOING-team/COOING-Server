@@ -2,6 +2,7 @@ package com.example.cooing.domain.answer;
 
 import com.example.cooing.global.entity.Answer;
 import com.example.cooing.global.repository.AnswerRepository;
+import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -9,10 +10,11 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import com.example.cooing.domain.answer.dto.CreateAnswerRequest;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +22,9 @@ public class AnswerService {
 
     @Value("${upload.directory}")
     private String uploadDirectory;
+
+    @Value("${openapi.key}")
+    private String accessKey;
 
     private final AnswerRepository answerRepository;
 
@@ -46,20 +51,116 @@ public class AnswerService {
         Long userId = 1L; // 임시 값
         Long questionId = 1L; // 임시 값
 
+        List<Map> responseBody = analysisRequest(createAnswerRequest.getAnswerText());
+
+        List<Map> morps = parseMorpAnalysis(responseBody);
+        List<Map> words = parseWordAnalysis(responseBody);
+
         try {
             Answer answer = Answer.builder()
                     .userId(userId)
                     .questionId(questionId)
                     .fileUrl(createAnswerRequest.getFileUrl())
                     .answerText(createAnswerRequest.getAnswerText())
+                    .comment(createAnswerRequest.getComment())
+                    .morp(morps)
+                    .word(words)
+                    .wordCount(words.size())
                     .createAt(LocalDateTime.now())
                     .build();
-
             answerRepository.save(answer);
         } catch (Exception e) {
             return e.getStackTrace()[0].toString();
         }
 
         return "등록 성공";
+    }
+
+    private List<Map> analysisRequest(String answerText) {
+        List<Map> sentences = new ArrayList<>();
+
+        String openApiURL = "http://aiopen.etri.re.kr:8000/WiseNLU_spoken";
+
+        Map<String, String> argument = new HashMap<>();
+        argument.put("analysis_code", "morp");
+        argument.put("text", answerText);
+
+        Map<String, Object> request = new HashMap<>();
+        request.put("argument", argument);
+
+        try {
+            URL url = new URL(openApiURL);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("POST");
+            con.setDoOutput(true);
+            con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            con.setRequestProperty("Authorization", accessKey);
+
+            Gson gson = new Gson();
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.write(gson.toJson(request).getBytes("UTF-8"));
+            wr.flush();
+            wr.close();
+
+            Integer responseCode = con.getResponseCode();
+            InputStream is = con.getInputStream();
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            StringBuffer sb = new StringBuffer();
+
+            String inputLine = "";
+            while ((inputLine = br.readLine()) != null) {
+                sb.append(inputLine);
+            }
+            String responBodyJson = sb.toString();
+
+            if (responseCode != 200) {
+                System.out.println("[error] " + responBodyJson);
+            }
+
+            Map<String, Object> responseBody = gson.fromJson(responBodyJson, Map.class);
+            Map<String, Object> returnObject;
+
+            returnObject = (Map<String, Object>) responseBody.get("return_object");
+            sentences = (List<Map>) returnObject.get("sentence");
+
+        } catch (Exception e) {
+            e.getStackTrace()[0].toString();
+        }
+        return sentences;
+    }
+
+    private List<Map> parseMorpAnalysis(List<Map> sentences) {
+        List<Map> result = new ArrayList<>();
+
+        List<Map> morps = (List<Map>) sentences.get(0).get("morp");
+
+        Long order = 0l;
+        for (Map morp: morps) {
+            Map<String, String> parsed = new HashMap<>();
+            parsed.put("order", order.toString());
+            parsed.put("morp", morp.get("lemma").toString());
+            parsed.put("type", morp.get("type").toString());
+            result.add(parsed);
+            order += 1;
+        }
+
+        return result;
+    }
+
+    private List<Map> parseWordAnalysis(List<Map> sentences) {
+        List<Map> result = new ArrayList<>();
+
+        List<Map> words = (List<Map>) sentences.get(0).get("word");
+
+        Long order = 0l;
+        for (Map word: words) {
+            Map<String, String> parsed = new HashMap<>();
+            parsed.put("order", order.toString());
+            parsed.put("word", word.get("text").toString());
+            result.add(parsed);
+            order += 1;
+        }
+
+        return result;
     }
 }
