@@ -36,6 +36,11 @@ dependencies {
 	//postgresql
 	implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.27'
 	runtimeOnly 'org.postgresql:postgresql'
+
+	// JSON
+	implementation 'io.hypersistence:hypersistence-utils-hibernate-62:3.6.1'
+	implementation 'com.fasterxml.jackson.module:jackson-module-jakarta-xmlbind-annotations'
+	implementation 'com.google.code.gson:gson:2.9.0'
 }
 
 tasks.named('test') {

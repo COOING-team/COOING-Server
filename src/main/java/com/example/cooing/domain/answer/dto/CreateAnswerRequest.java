@@ -8,4 +8,5 @@ import lombok.NoArgsConstructor;
 public class CreateAnswerRequest {
     private String answerText;
     private String fileUrl;
+    private String comment;
 }
