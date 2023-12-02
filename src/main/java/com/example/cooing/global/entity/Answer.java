@@ -24,8 +24,8 @@ public class Answer {
     @Column(name = "answer_id")
     private Long id;
 
-    @Column(name = "user_id") // user 테이블과 매핑
-    private Long userId;
+    @Column(name = "baby_id") // baby 테이블과 매핑
+    private Long babyId;
 
     @Column(name = "question_id") // 질문 테이블과 매핑
     private Long questionId;
