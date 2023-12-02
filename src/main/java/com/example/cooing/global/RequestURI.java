@@ -6,6 +6,7 @@ public class RequestURI {
     public static final String AUTH_URI = CURRENT_VER + "/auth";
     public static final String ANSWER_URI = CURRENT_VER + "/answer";
     public static final String HOME_URI = CURRENT_VER + "/home";
+    public static final String REPORT_URI = CURRENT_VER + "/report";
 
 
 }
