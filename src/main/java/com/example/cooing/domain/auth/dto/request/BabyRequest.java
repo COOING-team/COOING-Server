@@ -1,4 +1,4 @@
-package com.example.cooing.domain.auth;
+package com.example.cooing.domain.auth.dto.request;
 
 import com.example.cooing.global.enums.Sex;
 import lombok.Data;

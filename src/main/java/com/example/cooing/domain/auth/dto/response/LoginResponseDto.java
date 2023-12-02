@@ -1,4 +1,4 @@
-package com.example.cooing.domain.auth;
+package com.example.cooing.domain.auth.dto.response;
 
 import com.example.cooing.global.enums.Role;
 import lombok.Builder;
