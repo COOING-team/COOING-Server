@@ -12,7 +12,11 @@ public enum CustomErrorCode {
 
 
     // mypage
-    NO_BABY(3001, "아이를 등록하지 않았습니다.");
+    NO_BABY(3001, "아이를 등록하지 않았습니다."),
+
+    //question
+    NO_QUESTION(4001, "해당 인덱스에 대한 질문이 없습니다.");
+
 
 
     private final int code;

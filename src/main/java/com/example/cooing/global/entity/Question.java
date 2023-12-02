@@ -25,12 +25,12 @@ public class Question {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "question_id")//질문 고유번호
-    private Long id;
+    @Column(name = "question_id")
+    private Long id; //질문 고유번호
 
-    @Column(name = "cooing_id") //쿠잉이의 질문 데이터셋 인덱스 번호
-    private Long cooingId;
+    @Column(name = "cooing_index")
+    private Long cooingIndex;  //쿠잉이의 질문 데이터셋 인덱스 번호
 
     @Column(name = "question")
-    private String question;
+    private String content; //질문 텍스트
 }
