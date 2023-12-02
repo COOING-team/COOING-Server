@@ -9,6 +9,7 @@ import java.util.Optional;
 public interface BabyRepository extends JpaRepository<Baby, Long> {
     Optional<Baby> findById(Long id);
 
+    Optional<Baby> findByUserId(Long userId);
 
     Baby findByName(String name);
 

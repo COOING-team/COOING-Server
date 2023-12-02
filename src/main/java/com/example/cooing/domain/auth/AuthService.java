@@ -42,9 +42,6 @@ public class AuthService {
         return LoginResponseDto.builder()
                 .accessToken(serviceAccessToken)
                 .refreshToken(serviceRefreshToken)
-//                .userId(user.getId())
-//                .role(user.getRole())
-//                .userName(user.getName())
                 .build();
     }
 
@@ -67,6 +64,10 @@ public class AuthService {
 //    public MyInfoResponseDto getMyInfo(CustomUserDetails userDetails){
 //        User user = userRepository.findByEmail(userDetails.getEmail())
 //                .orElseThrow(() ->new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
+//
+//        Baby baby = babyRepository.findByUserId(user.getId())
+//                .orElseThrow(()-> Exception("등록한 아이가 없습니다."))
+//
 //
 //        //Todo 프로필 이미지 넣어야함
 //        return  MyInfoResponseDto.builder()
