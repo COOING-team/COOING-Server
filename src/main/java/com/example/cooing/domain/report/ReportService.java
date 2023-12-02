@@ -45,7 +45,13 @@ public class ReportService {
         List<Answer> answers = answerRepository
                 .findAllByCreateAtBetween(daysOfWeek.get(0).atTime(LocalTime.MIN), daysOfWeek.get(6).atTime(LocalTime.MIN));
 
-        ArrayList<Boolean> secretNote = makeSecretNote(answers);
+//        ArrayList<Boolean> secretNote = makeSecretNote(answers);
+        //임시 더미 데이터
+        ArrayList<Boolean> secretNote = new ArrayList<>();
+        for(int i = 0; i < 17; i++) {
+            secretNote.add(true);
+        }
+
         Map<String, Integer> frequentWords = makeFrequentWords(answers);
 
         Report report = Report.builder()
@@ -63,6 +69,14 @@ public class ReportService {
 
     private ArrayList<Boolean> makeSecretNote(List<Answer> answers) {
         ArrayList<Boolean> secretNote = new ArrayList<>();
+
+        ArrayList<Boolean> result1 = evaluateSentenceStructure(answers);
+        ArrayList<Boolean> result2 = evaluateMeaning(answers);
+        ArrayList<Boolean> result3 = evaluateMorps(answers);
+
+        secretNote.addAll(result1);
+        secretNote.addAll(result2);
+        secretNote.addAll(result3);
 
         return secretNote;
     }
@@ -94,6 +108,34 @@ public class ReportService {
                 .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
                 .limit(5)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private ArrayList<Boolean> evaluateSentenceStructure(List<Answer> answers) {
+        ArrayList<Boolean> result = new ArrayList<>();
+
+//        // 일주일동안 구사한 문장들의 평균 단어 수로 판단
+//
+//        String[] sentences = text.split("\\.\\s*");
+//
+//        // 각 문장의 단어 수를 계산하고 출력
+//        for (String sentence : sentences) {
+//            int wordCount = countWords(sentence);
+//            System.out.println("Words in sentence: \"" + sentence + "\": " + wordCount);
+//        }
+
+        return result;
+    }
+
+    private ArrayList<Boolean> evaluateMeaning(List<Answer> answers) {
+        ArrayList<Boolean> result = new ArrayList<>();
+
+        return result;
+    }
+
+    private ArrayList<Boolean> evaluateMorps(List<Answer> answers) {
+        ArrayList<Boolean> result = new ArrayList<>();
+
+        return result;
     }
 
 }
