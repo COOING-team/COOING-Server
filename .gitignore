@@ -29,3 +29,6 @@ replay_pid*
 
 ### setting file ###
 **/application.yml
+# Project exclude paths
+/.gradle/
+/build/
