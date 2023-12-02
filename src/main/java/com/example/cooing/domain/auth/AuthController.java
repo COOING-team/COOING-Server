@@ -1,6 +1,6 @@
 package com.example.cooing.domain.auth;
 
-import com.example.cooing.domain.auth.kakao.req.KakaoLoginRequest;
+import com.example.cooing.domain.auth.kakao.req.LoginRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
@@ -18,11 +18,19 @@ public class AuthController {
     private final AuthService authService;
 
 
-    @PostMapping("/kakao")
+//    @PostMapping("/kakao")
+//    @Synchronized
+//    @Operation(summary = "카카오 로그인", description = "kakao AuthorizationCode 넣으면 JWT AccessToken이 나옵니다. \n")
+//    public synchronized ResponseEntity<?> loginKakao(@RequestBody KakaoLoginRequest kakaoLoginRequest) {
+//        return ResponseEntity.ok(authService.kakaoLogin(kakaoLoginRequest.getAuthorizationCode()));
+//    }
+
+
+    @PostMapping("/kakao-login")
     @Synchronized
-    @Operation(summary = "카카오 로그인", description = "kakao AuthorizationCode 넣으면 JWT AccessToken이 나옵니다. \n")
-    public synchronized ResponseEntity<?> loginKakao(@RequestBody KakaoLoginRequest kakaoLoginRequest) {
-        return ResponseEntity.ok(authService.login(kakaoLoginRequest.getAuthorizationCode()));
+    @Operation(summary = "카카오 로그인", description = "RequestDto를 넣으면 넣으면 JWT AccessToken이 나옵니다. \n")
+    public synchronized ResponseEntity<?> loginKakao(@RequestBody LoginRequest loginRequest) {
+        return ResponseEntity.ok(authService.login(loginRequest));
     }
 
     @GetMapping("/user/info")

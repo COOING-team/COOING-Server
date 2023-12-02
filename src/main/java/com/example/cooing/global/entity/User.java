@@ -38,6 +38,9 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private OAuthProvider oAuthProvider;
 
+    @Column(nullable = false)
+    private String providerId;
+
     @Enumerated(EnumType.STRING)
 //    @Column(nullable = false)
     private Role role; //USER(=Non Artist), ADMIN, ARTIST로 정의
@@ -66,11 +69,12 @@ public class User implements UserDetails {
 
 
     @Builder
-    public User(String email, Role role, String name, OAuthProvider oAuthProvider) {
+    public User(String email, Role role, String name, OAuthProvider oAuthProvider, String providerId) {
         this.email = email;
         this.name = name;
         this.oAuthProvider = oAuthProvider;
         this.role = role;
+        this.providerId = providerId;
     }
 
     public void updateRole(Role role){
