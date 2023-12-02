@@ -42,8 +42,8 @@ public class User implements UserDetails {
 //    @Column(nullable = false)
     private Role role; //USER(=Non Artist), ADMIN, ARTIST로 정의
 
-    @OneToMany
     @JoinColumn(name = "user_id")
+    @OneToMany(fetch = FetchType.EAGER)
     private List<Baby> babyList;
 
 
@@ -61,9 +61,6 @@ public class User implements UserDetails {
         this.role = role;
     }
 
-    public void update(String name, String profilePicUrl) {
-
-    }
 
     public void addBaby(Baby baby) {
         babyList.add(baby);
