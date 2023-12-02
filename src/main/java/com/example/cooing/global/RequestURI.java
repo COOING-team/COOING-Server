@@ -9,5 +9,4 @@ public class RequestURI {
     public static final String REPORT_URI = CURRENT_VER + "/report";
     public static final String HOME_URI = CURRENT_VER + "/home";
 
-
 }

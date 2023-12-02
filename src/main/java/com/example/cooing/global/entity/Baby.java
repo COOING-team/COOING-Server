@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -34,5 +35,9 @@ public class Baby {
 
     @Column(name = "create_at")
     private LocalDateTime createAt;
+
+    @JoinColumn(name = "baby_id")
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<Report> reportList;
 
 }
