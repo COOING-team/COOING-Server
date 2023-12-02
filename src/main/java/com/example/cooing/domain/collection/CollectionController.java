@@ -29,7 +29,7 @@ public class CollectionController {
     try {
       List<MonthlyAnswerDto> monthlyAnswerDto = collectionService.getAllCollectionByMonth(year,
           month);
-      return BaseResponseDto.success(month + "월의 답변 목록 조회 성공", monthlyAnswerDto);
+      return BaseResponseDto.success(year+"년 "+month + "월의 답변 목록 조회 성공", monthlyAnswerDto);
     } catch (CustomException e) {
       // 실패 시
       return BaseResponseDto.fail(e.getCustomErrorCode().getCode(), e.getMessage());
@@ -41,7 +41,7 @@ public class CollectionController {
   public BaseResponseDto<AnswerResponseDto> getAnswer(
       @PathVariable("answerId") Long answerId) {
     try {
-      return BaseResponseDto.success("질문 조회 성공", collectionService.getAnswer(answerId));
+      return BaseResponseDto.success( answerId+"번 기록 조회 성공", collectionService.getAnswer(answerId));
     } catch (CustomException e) {
       // 실패 시
       return BaseResponseDto.fail(e.getCustomErrorCode().getCode(), e.getMessage());
