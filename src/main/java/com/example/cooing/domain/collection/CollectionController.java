@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping(COLLECTION_URI)
@@ -24,8 +25,8 @@ public class CollectionController {
   @GetMapping(value = "/{year}/{month}")
   @Operation(summary = "[모아보기] 그해 그월의 답변목록 반환", description = "년과 월을 넘겨주세요")
   public BaseResponseDto<List<MonthlyAnswerDto>> getMonthlyCollection(
-      @PathVariable("year") int year,
-      @PathVariable("month") int month) {
+      @RequestParam("year") Integer year,
+      @RequestParam("month") Integer month) {
     try {
       List<MonthlyAnswerDto> monthlyAnswerDto = collectionService.getAllCollectionByMonth(year,
           month);
