@@ -21,7 +21,7 @@ public class HomeController {
     private final HomeService homeService;
 
     @GetMapping(value = "/info")
-    @Operation(summary = "홈 정보 조회", description = "태어난 지 & 말을 기록한지")
+    @Operation(summary = "[홈] 홈 정보 조회", description = "태어난 지 & 말을 기록한지 & 오늘 기록을 했는지.(이미 기록했다면 True)")
     public BaseResponseDto<HomeResponseDto> home(@AuthenticationPrincipal CustomUserDetails userDetail) {
         return BaseResponseDto.success("홈 정보 조회 성공", homeService.getHomeInfo(userDetail));
     }
