@@ -26,12 +26,12 @@ public class AnswerController {
     return ResponseEntity.ok(answerService.saveFileToStorage(multipartFile));
   }
 
-  @PostMapping("/create")
+  @PostMapping("/create/{cooingIndex}")
   @Operation(summary = "최종 질문 텍스트와 음성파일 URL 등록", description = "음성 파일을 서버에 저장한 뒤 얻은 URL을 넣어주세요.")
   public ResponseEntity<String> createAnswerData(
       @AuthenticationPrincipal CustomUserDetails userDetail,
-      @RequestBody CreateAnswerRequest createAnswerRequest) {
-    return ResponseEntity.ok(answerService.createAnswer(userDetail, createAnswerRequest));
+      @RequestBody CreateAnswerRequest createAnswerRequest,
+      @PathVariable("cooingIndex") Long cooingIndex) {
+    return ResponseEntity.ok(answerService.createAnswer(userDetail, createAnswerRequest, cooingIndex));
   }
-
 }
