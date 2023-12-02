@@ -33,6 +33,7 @@ public class AnswerController {
       @AuthenticationPrincipal CustomUserDetails userDetail,
       @RequestBody CreateAnswerRequest createAnswerRequest,
       @PathVariable("cooingIndex") Long cooingIndex) {
-    return BaseResponseDto.success("기록 완료",answerService.createAnswer(userDetail, createAnswerRequest, cooingIndex));
+    answerService.createAnswer(userDetail, createAnswerRequest, cooingIndex);
+    return BaseResponseDto.success("기록 완료",null);
   }
 }
