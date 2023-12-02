@@ -49,6 +49,8 @@ public class ReportService {
 
         List<Answer> answers = answerRepository
                 .findAllByCreateAtBetween(daysOfWeek.get(0).atTime(LocalTime.MIN), daysOfWeek.get(6).atTime(LocalTime.MIN));
+        //Todo 여기 유저나 베이비 검사 안해도 되는 find 문인지 의문!
+
 
 //        ArrayList<Boolean> secretNote = makeSecretNote(answers);
         //임시 더미 데이터
