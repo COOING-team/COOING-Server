@@ -31,7 +31,7 @@ public class ReportController {
     }
 
   @GetMapping(value = "/info")
-  @Operation(summary = "[info] 레포트 상단정보", description = "n월 n째주 쿠잉이의 주간 레포트 / 000, 태어난지 N개월쨰")
+  @Operation(summary = "[레포트] 상단정보", description = "n월 n째주 쿠잉이의 주간 레포트 / 000, 태어난지 N개월쨰")
   public BaseResponseDto<InfoResponseDto> getInfo(@AuthenticationPrincipal CustomUserDetails userDetail) {
     try {
       return BaseResponseDto.success("info 정보 조회 성공", reportService.getInfo(userDetail));

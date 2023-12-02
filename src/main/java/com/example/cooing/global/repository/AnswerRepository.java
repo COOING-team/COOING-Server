@@ -11,6 +11,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
 
    int countByBabyId(Long babyId);
    List<Answer> findAllByCreateAtBetween(LocalDateTime start, LocalDateTime end);
+   Optional<Answer> findByCreateAt(LocalDateTime today);
 
    Optional<Answer> findById(Long answerId);
 }

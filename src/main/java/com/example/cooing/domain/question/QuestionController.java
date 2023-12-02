@@ -36,7 +36,7 @@ public class QuestionController {
     }
   }
   @GetMapping(value = "/{cooingIndex}")
-  @Operation(summary = "해당 질문 반환", description = "홈에 있는 cooingDay에 +1 한 값을 입력하면 그 다음 질문 번호가 되겠죠?")
+  @Operation(summary = "[홈] 해당 질문 반환", description = "홈에 있는 cooingDay에 +1 한 값을 입력하면 그 다음 질문 번호가 되겠죠?")
   public BaseResponseDto<QuestionResponseDto> getQuestion(@PathVariable("cooingIndex") Long cooingIndex) {
     try {
       QuestionResponseDto questionResponseDto = questionService.getQuestion(cooingIndex);
