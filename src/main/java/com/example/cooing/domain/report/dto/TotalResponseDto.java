@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class TotalInfoResponseDto {
+public class TotalResponseDto {
   private final Integer totalWordNum;
   private final String mostUseWord;
 }

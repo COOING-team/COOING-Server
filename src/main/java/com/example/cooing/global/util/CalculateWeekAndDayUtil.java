@@ -23,4 +23,22 @@ public class CalculateWeekAndDayUtil {
 
         return weekOfDays;
     }
+    public static WeekOfMonthDto getYearMonthWeekInfo(LocalDate date) {
+
+        int year = date.getYear();
+        int month = date.getMonthValue();
+        int weekOfMonth = getWeekOfMonth(date);
+
+        return new WeekOfMonthDto(year,month,weekOfMonth);
+    }
+
+    private static int getWeekOfMonth(LocalDate date) {
+        // 주의 시작은 일요일 (DayOfWeek.SUNDAY)
+        LocalDate firstDayOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
+        int firstDayOfWeekValue = DayOfWeek.SUNDAY.getValue();
+        int dayOfWeekValue = firstDayOfMonth.getDayOfWeek().getValue();
+        int weekOfMonth = (firstDayOfMonth.getDayOfMonth() + firstDayOfWeekValue - dayOfWeekValue) / 7 + 1;
+
+        return weekOfMonth;
+    }
 }
