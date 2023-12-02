@@ -1,18 +1,23 @@
 package com.example.cooing.domain.auth;
 
-import com.example.cooing.domain.auth.dto.request.LoginRequest;
+import static com.example.cooing.global.RequestURI.AUTH_URI;
+
 import com.example.cooing.domain.auth.dto.request.BabyRequest;
+import com.example.cooing.domain.auth.dto.request.LoginRequest;
 import com.example.cooing.domain.auth.dto.response.BabyResponseDto;
 import com.example.cooing.domain.auth.dto.response.InfoResponseDto;
 import com.example.cooing.domain.auth.dto.response.LoginResponseDto;
 import com.example.cooing.global.entity.BaseResponseDto;
+import com.example.cooing.global.exception.CustomException;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-
-import static com.example.cooing.global.RequestURI.AUTH_URI;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping(AUTH_URI)
 @RestController
@@ -37,10 +42,18 @@ public class AuthController {
     return BaseResponseDto.success("아이 정보 등록 완료", authService.createBaby(userDetail, babyRequest));
   }
 
-  @GetMapping("/user/info")
-  @Operation(summary = "유저 마이페이지 정보 조회", description = "토큰O. 프로필 이미지 제공합니다.")
+  @GetMapping("/baby")
+  @Operation(summary = "아이 정보 조회 [마이페이지]", description = "토큰O.")
   public BaseResponseDto<InfoResponseDto> MyInfo(
       @AuthenticationPrincipal CustomUserDetails userDetail) {
-    return BaseResponseDto.success("마이페이지 조회 성공", authService.getMyInfo(userDetail));
+    try {
+      InfoResponseDto infoResponseDto = authService.getMyInfo(userDetail);
+
+      return BaseResponseDto.success("마이페이지 조회 성공", infoResponseDto);
+    } catch (CustomException e) {
+      // 실패 시
+      return BaseResponseDto.fail(e.getCustomErrorCode().getCode(), e.getMessage());
+    }
   }
+
 }
