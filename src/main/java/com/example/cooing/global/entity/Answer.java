@@ -27,8 +27,8 @@ public class Answer {
     @Column(name = "baby_id") // baby 테이블과 매핑
     private Long babyId;
 
-    @Column(name = "question_id") // 질문 테이블과 매핑
-    private Long questionId;
+    @Column(name = "cooing_index") // 질문 테이블과 매핑
+    private Long cooingIndex;
 
     @Column(name = "file_url")
     private String fileUrl;

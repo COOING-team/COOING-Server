@@ -1,7 +1,9 @@
 package com.example.cooing.global.util;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.temporal.TemporalAdjusters;
 
 public class CalculateWithBirthUtil {
 
@@ -10,7 +12,6 @@ public class CalculateWithBirthUtil {
     Period period = Period.between(birthDate, currentDate);
     return (int) period.toTotalMonths();
   }
-
 
   public static int getAge(LocalDate birthDate) {
     LocalDate currentDate = LocalDate.now();
@@ -25,5 +26,4 @@ public class CalculateWithBirthUtil {
 
     return age;
   }
-
 }

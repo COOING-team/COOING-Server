@@ -23,7 +23,7 @@ public class HomeController {
     @GetMapping(value = "/info")
     @Operation(summary = "홈 정보 조회", description = "태어난 지 & 말을 기록한지")
     public BaseResponseDto<HomeResponseDto> home(@AuthenticationPrincipal CustomUserDetails userDetail) {
-        return BaseResponseDto.success("아이 정보 등록 완료", homeService.getHomeInfo(userDetail));
+        return BaseResponseDto.success("홈 정보 조회 성공", homeService.getHomeInfo(userDetail));
     }
 
 }
