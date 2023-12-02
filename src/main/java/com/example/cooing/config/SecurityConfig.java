@@ -29,63 +29,66 @@ import java.util.List;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final CustomUserDetailsService customUserDetailsService;
-    private final UserRepository userRepository;
-    private final JwtService jwtService;
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  private final CustomUserDetailsService customUserDetailsService;
+  private final UserRepository userRepository;
+  private final JwtService jwtService;
 
-        http.formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .csrf(AbstractHttpConfigurer::disable)
-                .headers(headers -> headers.frameOptions(
-                        HeadersConfigurer.FrameOptionsConfig::disable))
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-                .sessionManagement(
-                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+    http.formLogin(AbstractHttpConfigurer::disable)
+        .httpBasic(AbstractHttpConfigurer::disable)
+        .csrf(AbstractHttpConfigurer::disable)
+        .headers(headers -> headers.frameOptions(
+            HeadersConfigurer.FrameOptionsConfig::disable))
 
-        http.cors(httpSecurityCorsConfigurer -> corsConfigurationSource());
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+    http.cors(httpSecurityCorsConfigurer -> corsConfigurationSource());
 
-
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring()
-                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**"
-                        , "/sign/**", "/product/**","/auth/**", "/image/**", "/artist/**",
-                        RequestURI.AUTH_URI);
-    }
+    return http.build();
+  }
 
 
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setExposedHeaders(List.of("*"));
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+  @Bean
+  public WebSecurityCustomizer webSecurityCustomizer() {
+    return (web) -> web.ignoring()
+        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**"
+            , "/sign/**", "/product/**", "/auth/**", "/image/**", "/artist/**",
+            RequestURI.AUTH_URI);
+  }
 
 
-    @Bean
-    public AuthenticationManager authenticationManager() {
-        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+  @Bean
+  CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.setAllowedOrigins(List.of("*"));
+    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+    configuration.setAllowedHeaders(List.of("*"));
+    configuration.setExposedHeaders(List.of("*"));
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
+  }
+
+
+  @Bean
+  public AuthenticationManager authenticationManager() {
+    DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
 
 //        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
-        daoAuthenticationProvider.setUserDetailsService(customUserDetailsService);
-        return new ProviderManager(daoAuthenticationProvider);
-    }
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(){
-        JwtAuthenticationFilter jwtAuthenticationFilter=new JwtAuthenticationFilter(jwtService,userRepository);
-        return jwtAuthenticationFilter;
-    }
+    daoAuthenticationProvider.setUserDetailsService(customUserDetailsService);
+    return new ProviderManager(daoAuthenticationProvider);
+  }
+
+  @Bean
+  public JwtAuthenticationFilter jwtAuthenticationFilter() {
+    JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtService,
+        userRepository);
+    return jwtAuthenticationFilter;
+  }
 
 }

@@ -10,11 +10,11 @@ import java.time.LocalDate;
 @Builder
 public class InfoResponseDto {
 
-    private final int month;
+  private final int month;
 
-    private final String name;
+  private final String name;
 
-    private final Sex sex;
-    private final int age;
-    private final LocalDate birth;
+  private final Sex sex;
+  private final int age;
+  private final LocalDate birth;
 }
