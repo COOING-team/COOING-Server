@@ -2,6 +2,7 @@ package com.example.cooing.domain.collection;
 
 import static com.example.cooing.global.RequestURI.COLLECTION_URI;
 
+import com.example.cooing.domain.auth.CustomUserDetails;
 import com.example.cooing.domain.collection.dto.AnswerResponseDto;
 import com.example.cooing.domain.collection.dto.MonthlyAnswerDto;
 import com.example.cooing.global.base.BaseResponseDto;
@@ -9,6 +10,7 @@ import com.example.cooing.global.exception.CustomException;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,14 +24,14 @@ public class CollectionController {
 
   private final CollectionService collectionService;
 
-  @GetMapping(value = "/{year}/{month}")
+  @GetMapping()
   @Operation(summary = "[모아보기] 그해 그월의 답변목록 반환", description = "년과 월을 넘겨주세요")
   public BaseResponseDto<List<MonthlyAnswerDto>> getMonthlyCollection(
+      @AuthenticationPrincipal CustomUserDetails userDetail,
       @RequestParam("year") Integer year,
       @RequestParam("month") Integer month) {
     try {
-      List<MonthlyAnswerDto> monthlyAnswerDto = collectionService.getAllCollectionByMonth(year,
-          month);
+      List<MonthlyAnswerDto> monthlyAnswerDto = collectionService.getAllCollectionByMonth(userDetail, year, month);
       return BaseResponseDto.success(year+"년 "+month + "월의 답변 목록 조회 성공", monthlyAnswerDto);
     } catch (CustomException e) {
       // 실패 시
