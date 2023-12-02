@@ -8,6 +8,7 @@ public class RequestURI {
     public static final String QUESTION_URI = CURRENT_VER + "/question";
 
     public static final String HOME_URI = CURRENT_VER + "/home";
+    public static final String REPORT_URI = CURRENT_VER + "/report";
 
 
 }
