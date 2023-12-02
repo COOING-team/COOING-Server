@@ -1,13 +1,17 @@
 package com.example.cooing.domain.auth;
 
 
-
+import com.example.cooing.domain.auth.dto.request.BabyRequest;
+import com.example.cooing.domain.auth.dto.request.LoginRequest;
+import com.example.cooing.domain.auth.dto.response.BabyResponseDto;
+import com.example.cooing.domain.auth.dto.response.InfoResponseDto;
+import com.example.cooing.domain.auth.dto.response.LoginResponseDto;
 import com.example.cooing.domain.auth.jwt.JwtService;
-import com.example.cooing.domain.auth.kakao.req.LoginRequest;
 import com.example.cooing.global.entity.Baby;
 import com.example.cooing.global.entity.User;
 import com.example.cooing.global.enums.OAuthProvider;
 import com.example.cooing.global.enums.Role;
+import com.example.cooing.global.exception.CustomException;
 import com.example.cooing.global.repository.BabyRepository;
 import com.example.cooing.global.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -15,7 +19,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
+
+import static com.example.cooing.global.exception.CustomErrorCode.NO_BABY;
 
 @Service
 @RequiredArgsConstructor
@@ -29,14 +37,13 @@ public class AuthService {
 
 
     @Transactional
-    public LoginResponseDto login(LoginRequest loginRequest){
+    public LoginResponseDto login(LoginRequest loginRequest) {
 
         User user = userRepository.findByEmail(loginRequest.getEmail()).orElseGet(
-                ()->saveUser(loginRequest)
+                () -> saveUser(loginRequest)
         );
-        String serviceAccessToken= jwtService.createAccessToken(loginRequest.getEmail());
-        String serviceRefreshToken= jwtService.createRefreshToken(loginRequest.getEmail());
-
+        String serviceAccessToken = jwtService.createAccessToken(loginRequest.getEmail());
+        String serviceRefreshToken = jwtService.createRefreshToken(loginRequest.getEmail());
 
 
         return LoginResponseDto.builder()
@@ -46,7 +53,7 @@ public class AuthService {
     }
 
     @Transactional
-    public User saveUser(LoginRequest loginRequest){
+    public User saveUser(LoginRequest loginRequest) {
 
         User member = User.builder()
                 .oAuthProvider(OAuthProvider.KAKAO)
@@ -56,46 +63,54 @@ public class AuthService {
                 .name(loginRequest.getNickname())
                 .build();
         userRepository.saveAndFlush(member);
-        return  member;
+        return member;
 
     }
-
-//    @Transactional
-//    public MyInfoResponseDto getMyInfo(CustomUserDetails userDetails){
-//        User user = userRepository.findByEmail(userDetails.getEmail())
-//                .orElseThrow(() ->new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
-//
-//        Baby baby = babyRepository.findByUserId(user.getId())
-//                .orElseThrow(()-> Exception("등록한 아이가 없습니다."))
-//
-//
-//        //Todo 프로필 이미지 넣어야함
-//        return  MyInfoResponseDto.builder()
-//                .name(userDetails.getUsername())
-//                .email(user.getEmail())
-//                .profilePicUrl(user.getProfilePicUrl())
-//                .build();
-//    }
 
     @Transactional
-    public MyInfoResponseDto changeInfo(CustomUserDetails userDetails, MyInfoChangeRequestDto myInfoChangeRequestDto){
+    public InfoResponseDto getMyInfo(CustomUserDetails userDetails) {
         User user = userRepository.findByEmail(userDetails.getEmail())
-                .orElseThrow(() ->new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
 
-        user.update(myInfoChangeRequestDto.getName(),myInfoChangeRequestDto.getProfilePicUrl());
+        Baby baby = babyRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new CustomException(NO_BABY));
 
-        return  MyInfoResponseDto.builder()
-                .name(myInfoChangeRequestDto.getName())
-                .email(user.getEmail()) //안바뀜
-//                .followingNum(user.getFollows().size()) //안바뀜
-                .profilePicUrl(myInfoChangeRequestDto.getProfilePicUrl())
+        return InfoResponseDto.builder()
+                .name(baby.getName())
+                .age(getAge(baby.getBirth()))
+                .month(getMonthsSinceBirth(baby.getBirth()))
+                .birth(baby.getBirth())
+                .sex(baby.getSex())
                 .build();
     }
+
+
+    public int getMonthsSinceBirth(LocalDate birthDate) {
+        LocalDate currentDate = LocalDate.now();
+        Period period = Period.between(birthDate, currentDate);
+        return (int) period.toTotalMonths();
+    }
+
+
+    public int getAge(LocalDate birthDate) {
+        LocalDate currentDate = LocalDate.now();
+
+        Period period = Period.between(birthDate, currentDate);
+        int age = period.getYears();
+
+        // 생일 안 지난 경우 -1
+        if (birthDate.plusYears(age).isAfter(currentDate)) {
+            age--;
+        }
+
+        return age;
+    }
+
 
     @Transactional
     public BabyResponseDto createBaby(CustomUserDetails userDetails, BabyRequest babyRequest) {
         User user = userRepository.findByEmail(userDetails.getEmail())
-                .orElseThrow(() ->new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
 
         Baby baby = saveBaby(babyRequest);
         user.addBaby(baby);
@@ -108,7 +123,7 @@ public class AuthService {
 
 
     @Transactional
-    public Baby saveBaby(BabyRequest babyRequest){
+    public Baby saveBaby(BabyRequest babyRequest) {
 
         Baby baby = Baby.builder()
                 .sex(babyRequest.getSex())
@@ -117,6 +132,6 @@ public class AuthService {
                 .name(babyRequest.getName())
                 .build();
         babyRepository.saveAndFlush(baby);
-        return  baby;
+        return baby;
     }
 }

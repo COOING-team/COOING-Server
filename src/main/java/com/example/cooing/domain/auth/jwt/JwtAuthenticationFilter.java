@@ -1,7 +1,6 @@
 package com.example.cooing.domain.auth.jwt;
 
 
-
 import com.example.cooing.domain.auth.CustomUserDetails;
 import com.example.cooing.global.RequestURI;
 import com.example.cooing.global.entity.User;
@@ -27,69 +26,62 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private static final String[] NO_CHECK_URI_ARRAY = {
-            //토큰 필요 없는 것들은 여기에서 설정해야 함
 
-            RequestURI.AUTH_URI ,
-//
-//            RequestURI.ARTIST_URI + "/info/public",
-//
-//            RequestURI.PRODUCT_URI + "/popular",
-//            RequestURI.PRODUCT_URI +"/new",
-//            RequestURI.PRODUCT_URI + "/detail",
-//
-//            RequestURI.GOODS_URI + "/popular-normal",
-//            RequestURI.GOODS_URI + "/popular-nft",
-//            RequestURI.GOODS_URI + "/detail/{id}",
+  private static final String[] NO_CHECK_URI_ARRAY = {
+      //토큰 필요 없는 것들은 여기에서 설정해야 함
 
-            "/swagger-ui/index.html",
-            "/favicon.ico"
-    };
+      RequestURI.AUTH_URI + "kakao-login",
 
-    private static final List<String> NO_CHECK_URIS = new ArrayList<>(
-            Arrays.asList(NO_CHECK_URI_ARRAY));
-    private final JwtService jwtService;
-    private final UserRepository userRepository;
+      "/swagger-ui/index.html",
+      "/favicon.ico"
+  };
 
-    private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
+  private static final List<String> NO_CHECK_URIS = new ArrayList<>(
+      Arrays.asList(NO_CHECK_URI_ARRAY));
+  private final JwtService jwtService;
+  private final UserRepository userRepository;
 
-    public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
-                                                  FilterChain filterChain) throws ServletException, IOException {
-        log.info("checkAccessTokenAndAuthentication() 호출");
-        jwtService.extractAccessToken(request)
-                .filter(jwtService::isTokenValid)
-                .ifPresent(accessToken -> jwtService.extractUuid(accessToken)
-                        .ifPresent(id->userRepository.findByEmail(id)
-                                .ifPresent(this::saveAuthentication)));
+  private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
-        filterChain.doFilter(request, response);
-    }
+  public void checkAccessTokenAndAuthentication(HttpServletRequest request,
+      HttpServletResponse response,
+      FilterChain filterChain) throws ServletException, IOException {
+    log.info("checkAccessTokenAndAuthentication() 호출");
+    jwtService.extractAccessToken(request)
+        .filter(jwtService::isTokenValid)
+        .ifPresent(accessToken -> jwtService.extractUuid(accessToken)
+            .ifPresent(id -> userRepository.findByEmail(id)
+                .ifPresent(this::saveAuthentication)));
 
-    public void saveAuthentication(User user) {
+    filterChain.doFilter(request, response);
+  }
 
-        CustomUserDetails customUserDetail=new CustomUserDetails(user);
+  public void saveAuthentication(User user) {
 
-        Authentication authentication =
-                new UsernamePasswordAuthenticationToken(customUserDetail, null,
-                        authoritiesMapper.mapAuthorities(customUserDetail.getAuthorities()));
+    CustomUserDetails customUserDetail = new CustomUserDetails(user);
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+    Authentication authentication =
+        new UsernamePasswordAuthenticationToken(customUserDetail, null,
+            authoritiesMapper.mapAuthorities(customUserDetail.getAuthorities()));
 
-    }
+    SecurityContextHolder.getContext().setAuthentication(authentication);
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+  }
+
+  @Override
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+      FilterChain filterChain) throws ServletException, IOException {
 
 //        String NO_CHECK_URL = "/api/v1/auth/kakao";
-        if (request.getRequestURI().equals(NO_CHECK_URIS)) {
-            log.info("로그인 진입");
-            filterChain.doFilter(request, response);
-            return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
-        }
-
-        log.info("로그인 이외 페이지 진입");
-
-        checkAccessTokenAndAuthentication(request, response, filterChain);
-
+    if (request.getRequestURI().equals(NO_CHECK_URIS)) {
+      log.info("로그인 진입");
+      filterChain.doFilter(request, response);
+      return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
     }
+
+    log.info("로그인 이외 페이지 진입");
+
+    checkAccessTokenAndAuthentication(request, response, filterChain);
+
+  }
 }

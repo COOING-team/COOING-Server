@@ -1,4 +1,4 @@
-package com.example.cooing.domain.auth.kakao.req;
+package com.example.cooing.domain.auth.dto.request;
 
 import lombok.Data;
 
