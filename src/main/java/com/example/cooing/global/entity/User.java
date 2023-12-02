@@ -12,7 +12,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -32,8 +31,6 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String email;
 
-    @Column(name = "pic_url")
-    private String profilePicUrl;
 
     @Enumerated(EnumType.STRING)
     private OAuthProvider oAuthProvider;
@@ -45,31 +42,14 @@ public class User implements UserDetails {
 //    @Column(nullable = false)
     private Role role; //USER(=Non Artist), ADMIN, ARTIST로 정의
 
-    //    @Column(nullable = false)
-    private String accessToken;
-
-    //    @Column(nullable = false)
-    private String refreshToken;
-
-//    @OneToMany
-//    @JoinColumn(name = "user_id")
-//    private List<Like> likes;
-//
-//    @OneToMany
-//    @JoinColumn(name = "user_id")
-//    private Collection<Follow> follows;
-//
-//    @OneToMany
-//    @JoinColumn(name = "user_id")
-//    private Collection<Cart> carts;
-//
-//    @OneToMany
-//    @JoinColumn(name = "user_id")
-//    private Collection<Scrap> scraps;
+    @OneToMany
+    @JoinColumn(name = "user_id")
+    private List<Baby> babyList;
 
 
     @Builder
-    public User(String email, Role role, String name, OAuthProvider oAuthProvider, String providerId) {
+    public User(Long id, String email, Role role, String name, OAuthProvider oAuthProvider, String providerId) {
+        this.id = id;
         this.email = email;
         this.name = name;
         this.oAuthProvider = oAuthProvider;
@@ -83,6 +63,10 @@ public class User implements UserDetails {
 
     public void update(String name, String profilePicUrl) {
 
+    }
+
+    public void addBaby(Baby baby) {
+        babyList.add(baby);
     }
 
     @Override

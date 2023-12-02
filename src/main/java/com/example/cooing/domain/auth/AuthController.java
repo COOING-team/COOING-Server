@@ -17,27 +17,25 @@ public class AuthController {
 
     private final AuthService authService;
 
-
-//    @PostMapping("/kakao")
-//    @Synchronized
-//    @Operation(summary = "카카오 로그인", description = "kakao AuthorizationCode 넣으면 JWT AccessToken이 나옵니다. \n")
-//    public synchronized ResponseEntity<?> loginKakao(@RequestBody KakaoLoginRequest kakaoLoginRequest) {
-//        return ResponseEntity.ok(authService.kakaoLogin(kakaoLoginRequest.getAuthorizationCode()));
-//    }
-
-
     @PostMapping("/kakao-login")
     @Synchronized
     @Operation(summary = "카카오 로그인", description = "RequestDto를 넣으면 넣으면 JWT AccessToken이 나옵니다. \n")
-    public synchronized ResponseEntity<?> loginKakao(@RequestBody LoginRequest loginRequest) {
+    public synchronized ResponseEntity<LoginResponseDto> loginKakao(@RequestBody LoginRequest loginRequest) {
         return ResponseEntity.ok(authService.login(loginRequest));
     }
 
-    @GetMapping("/user/info")
-    @Operation(summary = "유저 마이페이지 정보 조회", description = "토큰이 필요합니다. 프로필 이미지 제공합니다.")
-    public ResponseEntity<MyInfoResponseDto> MyInfo(@AuthenticationPrincipal CustomUserDetails userDetail) {
-        return ResponseEntity.ok(authService.getMyInfo(userDetail));
+    @PostMapping("/baby")
+    @Synchronized
+    @Operation(summary = "아이 정보 등록", description = "RequestDto를 넣으면 넣으면 JWT AccessToken이 나옵니다. \n")
+    public synchronized ResponseEntity<BabyResponseDto> createBaby(@AuthenticationPrincipal CustomUserDetails userDetail, @RequestBody BabyRequest babyRequest) {
+        return ResponseEntity.ok(authService.createBaby(userDetail, babyRequest));
     }
+
+//    @GetMapping("/user/info")
+//    @Operation(summary = "유저 마이페이지 정보 조회", description = "토큰이 필요합니다. 프로필 이미지 제공합니다.")
+//    public ResponseEntity<MyInfoResponseDto> MyInfo(@AuthenticationPrincipal CustomUserDetails userDetail) {
+//        return ResponseEntity.ok(authService.getMyInfo(userDetail));
+//    }
 
     @PatchMapping("/user/info")
     @Operation(summary = "유저 마이페이지 수정", description = "토큰이 필요합니다. 프로필 이미지 제공합니다.\n\n" +

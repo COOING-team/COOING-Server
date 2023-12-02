@@ -10,6 +10,8 @@ import lombok.Getter;
 @Getter
 public class LoginResponseDto {
     private String accessToken;
+    private String refreshToken;
+
     private Role role;
     private Long userId;
     private String userName;
