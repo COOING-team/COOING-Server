@@ -31,7 +31,16 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
-	runtimeOnly 'com.h2database:h2'
+
+//	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+//	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+
+	//rest template 4.5.2에서 4.5.9로 업그레이드
+//	implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.2.1'
+
+	//jwt
+	implementation 'com.auth0:java-jwt:4.0.0'
 
 	//postgresql
 	implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.27'
