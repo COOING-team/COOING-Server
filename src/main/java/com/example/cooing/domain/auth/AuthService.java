@@ -42,9 +42,9 @@ public class AuthService {
         return LoginResponseDto.builder()
                 .accessToken(serviceAccessToken)
                 .refreshToken(serviceRefreshToken)
-                .userId(user.getId())
-                .role(user.getRole())
-                .userName(user.getName())
+//                .userId(user.getId())
+//                .role(user.getRole())
+//                .userName(user.getName())
                 .build();
     }
 

@@ -1,6 +1,7 @@
 package com.example.cooing.domain.auth;
 
 import com.example.cooing.domain.auth.kakao.req.LoginRequest;
+import com.example.cooing.global.entity.BaseResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
@@ -19,16 +20,16 @@ public class AuthController {
 
     @PostMapping("/kakao-login")
     @Synchronized
-    @Operation(summary = "카카오 로그인", description = "RequestDto를 넣으면 넣으면 JWT AccessToken이 나옵니다. \n")
-    public synchronized ResponseEntity<LoginResponseDto> loginKakao(@RequestBody LoginRequest loginRequest) {
-        return ResponseEntity.ok(authService.login(loginRequest));
+    @Operation(summary = "카카오 로그인", description = "RequestDto를 넣으면 넣으면 JWT AccessToken이 나옵니다.")
+    public synchronized BaseResponseDto<LoginResponseDto> loginKakao(@RequestBody LoginRequest loginRequest) {
+        return BaseResponseDto.success("로그인 성공", authService.login(loginRequest));
     }
 
     @PostMapping("/baby")
     @Synchronized
-    @Operation(summary = "아이 정보 등록", description = "RequestDto를 넣으면 넣으면 JWT AccessToken이 나옵니다. \n")
-    public synchronized ResponseEntity<BabyResponseDto> createBaby(@AuthenticationPrincipal CustomUserDetails userDetail, @RequestBody BabyRequest babyRequest) {
-        return ResponseEntity.ok(authService.createBaby(userDetail, babyRequest));
+    @Operation(summary = "아이 정보 등록", description = "회원가입 후, 아이를 등록하세요")
+    public synchronized BaseResponseDto<BabyResponseDto> createBaby(@AuthenticationPrincipal CustomUserDetails userDetail, @RequestBody BabyRequest babyRequest) {
+        return BaseResponseDto.success("아이 정보 등록 완료",authService.createBaby(userDetail, babyRequest));
     }
 
 //    @GetMapping("/user/info")
