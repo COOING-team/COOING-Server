@@ -19,10 +19,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
 
+import static com.example.cooing.global.util.CalculateWithBirthUtil.getAge;
+import static com.example.cooing.global.util.CalculateWithBirthUtil.getMonthsSinceBirth;
 import static com.example.cooing.global.exception.CustomErrorCode.NO_BABY;
 
 @Service
@@ -82,28 +82,6 @@ public class AuthService {
                 .birth(baby.getBirth())
                 .sex(baby.getSex())
                 .build();
-    }
-
-
-    public int getMonthsSinceBirth(LocalDate birthDate) {
-        LocalDate currentDate = LocalDate.now();
-        Period period = Period.between(birthDate, currentDate);
-        return (int) period.toTotalMonths();
-    }
-
-
-    public int getAge(LocalDate birthDate) {
-        LocalDate currentDate = LocalDate.now();
-
-        Period period = Period.between(birthDate, currentDate);
-        int age = period.getYears();
-
-        // 생일 안 지난 경우 -1
-        if (birthDate.plusYears(age).isAfter(currentDate)) {
-            age--;
-        }
-
-        return age;
     }
 
 
