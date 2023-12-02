@@ -7,7 +7,7 @@ import com.example.cooing.domain.auth.dto.request.LoginRequest;
 import com.example.cooing.domain.auth.dto.response.BabyResponseDto;
 import com.example.cooing.domain.auth.dto.response.InfoResponseDto;
 import com.example.cooing.domain.auth.dto.response.LoginResponseDto;
-import com.example.cooing.global.BaseResponseDto;
+import com.example.cooing.global.base.BaseResponseDto;
 import com.example.cooing.global.exception.CustomException;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;

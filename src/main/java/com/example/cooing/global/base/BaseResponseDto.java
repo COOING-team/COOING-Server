@@ -1,4 +1,4 @@
-package com.example.cooing.global.entity;
+package com.example.cooing.global.base;
 
 
 import lombok.AllArgsConstructor;

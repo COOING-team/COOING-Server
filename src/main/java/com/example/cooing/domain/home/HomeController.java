@@ -4,7 +4,7 @@ import static com.example.cooing.global.RequestURI.ANSWER_URI;
 
 import com.example.cooing.domain.auth.CustomUserDetails;
 import com.example.cooing.domain.home.dto.HomeResponseDto;
-import com.example.cooing.global.BaseResponseDto;
+import com.example.cooing.global.base.BaseResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(ANSWER_URI)
 @RestController
 @RequiredArgsConstructor
-public class HomerController {
+public class HomeController {
 
     private final HomeService homeService;
 
