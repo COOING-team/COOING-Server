@@ -1,6 +1,7 @@
 package com.example.cooing.domain.home;
 
 import static com.example.cooing.global.RequestURI.ANSWER_URI;
+import static com.example.cooing.global.RequestURI.HOME_URI;
 
 import com.example.cooing.domain.auth.CustomUserDetails;
 import com.example.cooing.domain.home.dto.HomeResponseDto;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping(ANSWER_URI)
+@RequestMapping(HOME_URI)
 @RestController
 @RequiredArgsConstructor
 public class HomeController {
