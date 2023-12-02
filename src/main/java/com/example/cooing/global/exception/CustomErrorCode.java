@@ -16,7 +16,10 @@ public enum CustomErrorCode {
 
   //question
   NO_QUESTION(4001, "해당 인덱스에 대한 질문이 없습니다."),
-  EXIST_QUESTION(4002,"이미 존재하는 쿠잉이 질문입니다.");
+  EXIST_QUESTION(4002,"이미 존재하는 쿠잉이 질문입니다."),
+
+  //answer
+  NO_ANSWER(5001, "해당 답변이에없습니다.");
 
 
   private final int code;

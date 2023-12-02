@@ -6,6 +6,8 @@ import com.example.cooing.domain.report.dto.TotalResponseDto;
 import com.example.cooing.global.base.BaseResponseDto;
 import com.example.cooing.global.exception.CustomException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
