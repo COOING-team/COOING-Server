@@ -6,6 +6,7 @@ import com.example.cooing.domain.auth.CustomUserDetails;
 import com.example.cooing.domain.report.dto.InfoResponseDto;
 import com.example.cooing.domain.report.dto.SecretNoteResponse;
 import com.example.cooing.domain.report.dto.TotalResponseDto;
+import com.example.cooing.domain.report.dto.UsingWordReponseDto;
 import com.example.cooing.global.base.BaseResponseDto;
 import com.example.cooing.global.exception.CustomException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,8 +27,7 @@ public class ReportController {
   @GetMapping(value = "/secret-note")
   @Operation(summary = "해당 주차의 레포트 데이터를 받아옵니다.", description = "빈출 단어도 레포트를 생성해야만 갱신됩니다.")
   public BaseResponseDto<SecretNoteResponse> SecretNote(
-      @AuthenticationPrincipal CustomUserDetails userDetail,
-      @RequestParam("month") Integer month,
+      @AuthenticationPrincipal CustomUserDetails userDetail, @RequestParam("month") Integer month,
       @RequestParam("week") Integer week) {
     return BaseResponseDto.success("ok", reportService.getSecretNote(userDetail, month, week));
   }
@@ -50,6 +50,21 @@ public class ReportController {
       @AuthenticationPrincipal CustomUserDetails userDetail) {
     try {
       return BaseResponseDto.success("total 정보 조회 성공", reportService.getTotalInfo(userDetail));
+    } catch (CustomException e) {
+      // 실패 시
+      return BaseResponseDto.fail(e.getCustomErrorCode().getCode(), e.getMessage());
+    }
+  }
+
+  @GetMapping(value = "/using-word")
+  @Operation(summary = "[레포트] 사용단어수", description = "년/월/주차를 입력하면 사용단어에 대한 리스트를 반환합니다. 이걸 차트로 바인딩하시면 됩니다.")
+  public BaseResponseDto<UsingWordReponseDto> getUsingWordChart(
+      @AuthenticationPrincipal CustomUserDetails userDetail,
+      @RequestParam("year") Integer year,
+      @RequestParam("month") Integer month,
+      @RequestParam("week") Integer week) {
+    try {
+      return BaseResponseDto.success("", reportService.getChart(userDetail, year, month, week));
     } catch (CustomException e) {
       // 실패 시
       return BaseResponseDto.fail(e.getCustomErrorCode().getCode(), e.getMessage());
