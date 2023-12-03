@@ -22,7 +22,7 @@ public class ReportController {
     private final ReportService reportService;
 
     @GetMapping(value = "/secret-note")
-    @Operation(summary = "해당 주차의 레포트 데이터를 받아옵니다.", description = "빈출 단어도 레포트를 생성해야만 갱신됩니다.")
+    @Operation(summary = "해당 주차의 시크릿 노트를 받아옵니다.", description = "빈출 단어도 시트릿 노트를 생성해야만 갱신됩니다.")
     public BaseResponseDto<SecretNoteResponse> SecretNote(@AuthenticationPrincipal CustomUserDetails userDetail,
                                                           @RequestParam Integer month,
                                                           @RequestParam Integer week) {
