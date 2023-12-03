@@ -3,6 +3,7 @@ package com.example.cooing.domain.report;
 import com.example.cooing.domain.auth.CustomUserDetails;
 import com.example.cooing.domain.report.dto.*;
 import com.example.cooing.global.entity.*;
+import com.example.cooing.global.enums.NoteStatus;
 import com.example.cooing.global.repository.*;
 import com.example.cooing.global.util.WeekOfMonthDto;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +15,11 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.example.cooing.global.enums.NoteStatus.*;
 import static com.example.cooing.global.util.CalculateWeekAndDayUtil.calculateWeekToDay;
 import static com.example.cooing.global.util.CalculateWeekAndDayUtil.getYearMonthWeekInfo;
 import static com.example.cooing.global.util.CalculateWithBirthUtil.getMonthsSinceBirth;
+import static com.example.cooing.global.util.DateUtil.getTotalWeekOfMonth;
 
 
 @Service
@@ -41,14 +44,64 @@ public class ReportService {
         return secretNoteResponse;
     }
 
+    public SecretNoteListResponse getSecretNoteList(CustomUserDetails userDetail, Integer month) {
+        User user = userRepository.findByEmail(userDetail.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
+
+        Baby baby = user.getBabyList().get(0);
+
+        ArrayList<SecretNoteList> secretNoteLists = confirmSecretNoteStatus(baby.getId(), month);
+
+        SecretNoteListResponse secretNoteListResponse = new SecretNoteListResponse(secretNoteLists);
+
+        return secretNoteListResponse;
+    }
+
+    private ArrayList<SecretNoteList> confirmSecretNoteStatus(Long babyId, Integer month) {
+        ArrayList<SecretNoteList> secretNoteLists = new ArrayList<>();
+        Integer weekCount = getTotalWeekOfMonth(month);
+
+        for (int i = 1; i <= weekCount; i++) {
+            NoteStatus noteStatus = verifyReportStatue(babyId, month, i);
+
+            SecretNoteList secretNoteList = SecretNoteList.builder()
+                    .noteStatus(noteStatus)
+                    .month(month)
+                    .week(i)
+                    .build();
+            secretNoteLists.add(secretNoteList);
+        }
+
+        return secretNoteLists;
+    }
+
+    private NoteStatus verifyReportStatue(Long babyId, Integer month, Integer week) {
+        Optional<Report> report = reportRepository.findByBabyIdAndMonthAndWeek(babyId, month, week);
+
+        if (report.isPresent()) {
+            return READABLE;
+        } else {
+            ArrayList<LocalDate> dayOfWeek = calculateWeekToDay(month, week);
+            List<Answer> answers =
+                    answerRepository.findAllByCreateAtBetweenAndBabyId(dayOfWeek.get(0).atTime(LocalTime.MIN),
+                            dayOfWeek.get(6).atTime(LocalTime.MAX), babyId);
+
+            if (answers.size() >= 3) {
+                return CREATABLE;
+            } else {
+                return NOT_CREATABLE;
+            }
+        }
+    }
+
     private Report makeReport(Baby baby, Integer month, Integer week) {
 
         ArrayList<LocalDate> daysOfWeek = calculateWeekToDay(month, week);
 
         List<Answer> answers = answerRepository
-                .findAllByCreateAtBetween(daysOfWeek.get(0).atTime(LocalTime.MIN), daysOfWeek.get(6).atTime(LocalTime.MIN));
-        //Todo 여기 유저나 베이비 검사 안해도 되는 find 문인지 의문!
-
+                .findAllByCreateAtBetweenAndBabyId(daysOfWeek.get(0).atTime(LocalTime.MIN),
+                        daysOfWeek.get(6).atTime(LocalTime.MAX),
+                        baby.getId());
 
         ArrayList<Boolean> secretNote = makeSecretNote(answers);
 
@@ -104,13 +157,12 @@ public class ReportService {
 
         Map<String, Integer> totalWords = new HashMap<>();
 
-        for (Answer answer: answers) {
+        for (Answer answer : answers) {
             List<Map> wordSet = answer.getWord();
-            for (Map map: wordSet) {
+            for (Map map : wordSet) {
                 if (!totalWords.containsKey(map.get("word"))) {
                     totalWords.put(map.get("word").toString(), 1);
-                }
-                else {
+                } else {
                     totalWords.put(map.get("word").toString(), totalWords.get(map.get("word")) + 1);
                 }
             }
@@ -134,7 +186,7 @@ public class ReportService {
         int totalSentence = 0;
         int totalWord = 0;
 
-        for (Answer answer: answers) {
+        for (Answer answer : answers) {
             String text = answer.getAnswerText();
             String[] sentences = text.split("[\\.\\?!]\\s*");
             totalSentence += sentences.length;
@@ -156,8 +208,7 @@ public class ReportService {
             result.add(true);
             result.add(true);
             result.add(false);
-        }
-        else {
+        } else {
             result.add(true);
             result.add(true);
             result.add(true);
@@ -171,9 +222,9 @@ public class ReportService {
 
         List<Boolean> result = Arrays.asList(false, false, false, false, false, false, false, false);
 
-        for (Answer answer: answers) {
+        for (Answer answer : answers) {
             List<Map> morps = answer.getMorp();
-            for (Map morp: morps) {
+            for (Map morp : morps) {
                 String text = morp.get("morp").toString();
                 String type = morp.get("type").toString();
 
@@ -224,9 +275,9 @@ public class ReportService {
 
         List<Boolean> result = Arrays.asList(false, false, false, false, false, false);
 
-        for (Answer answer: answers) {
+        for (Answer answer : answers) {
             List<Map> morps = answer.getMorp();
-            for (Map morp: morps) {
+            for (Map morp : morps) {
                 String text = morp.get("morp").toString();
                 String type = morp.get("type").toString();
 
@@ -266,24 +317,24 @@ public class ReportService {
 
     public InfoResponseDto getInfo(CustomUserDetails userDetail) {
         User user = userRepository.findByEmail(userDetail.getEmail())
-            .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
 
         Baby baby = user.getBabyList().get(0);
 
         WeekOfMonthDto yearMonthWeekInfo = getYearMonthWeekInfo(LocalDate.now());
 
         return InfoResponseDto.builder()
-            .month(yearMonthWeekInfo.getMonth())
-            .week(yearMonthWeekInfo.getWeekOfMonth())
-            .name(baby.getName())
-            .birthMonth(getMonthsSinceBirth(baby.getBirth()))
-            .build();
+                .month(yearMonthWeekInfo.getMonth())
+                .week(yearMonthWeekInfo.getWeekOfMonth())
+                .name(baby.getName())
+                .birthMonth(getMonthsSinceBirth(baby.getBirth()))
+                .build();
     }
 
 
     public TotalResponseDto getTotalInfo(CustomUserDetails userDetail) {
         User user = userRepository.findByEmail(userDetail.getEmail())
-            .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
 
         Baby baby = user.getBabyList().get(0);
 
@@ -301,15 +352,15 @@ public class ReportService {
         Map.Entry<String, Integer> mostUsedWordEntry = getMostUsedWord(totalWords);
 
         return TotalResponseDto.builder()
-            .totalWordNum(totalWords.size()) //Todo 여기 로직 수정 필요
-            .mostUseWord(mostUsedWordEntry.getKey())
-            .build();
+                .totalWordNum(totalWords.size()) //Todo 여기 로직 수정 필요
+                .mostUseWord(mostUsedWordEntry.getKey())
+                .build();
     }
 
     private Map.Entry<String, Integer> getMostUsedWord(Map<String, Integer> wordCountMap) {
         return wordCountMap.entrySet()
-            .stream()
-            .max(Map.Entry.comparingByValue())
-            .orElse(null);
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .orElse(null);
     }
 }

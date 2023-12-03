@@ -40,6 +40,13 @@ public class ReportController {
     }
   }
 
+    @GetMapping(value = "/secret-note-list")
+    @Operation(summary = "해당 월의 시크릿 노트 목록", description = "")
+    public BaseResponseDto<SecretNoteListResponse> SecretNoteList(@AuthenticationPrincipal CustomUserDetails userDetail,
+                                                          @RequestParam Integer month) {
+        return BaseResponseDto.success("ok", reportService.getSecretNoteList(userDetail, month));
+    }
+
 //  @GetMapping(value = "/total")
 //  @Operation(summary = "[total] 레포트 요약", description = "")
 //  public BaseResponseDto<TotalResponseDto> getTotal(@AuthenticationPrincipal CustomUserDetails userDetail) {

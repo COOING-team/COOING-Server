@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 public class CalculateWeekAndDayUtil {
 
+    // n월 m주차에 해당하는 날짜 7개를 리턴합니다. (일 ~ 토)
     public static ArrayList<LocalDate> calculateWeekToDay(Integer month, Integer week) {
         ArrayList<LocalDate> weekOfDays = new ArrayList<>();
 
@@ -23,6 +24,7 @@ public class CalculateWeekAndDayUtil {
 
         return weekOfDays;
     }
+
     public static WeekOfMonthDto getYearMonthWeekInfo(LocalDate date) {
 
         int year = date.getYear();
