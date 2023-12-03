@@ -1,8 +1,7 @@
 package com.example.cooing.domain.report;
 
 import com.example.cooing.domain.auth.CustomUserDetails;
-import com.example.cooing.domain.report.dto.InfoResponseDto;
-import com.example.cooing.domain.report.dto.TotalResponseDto;
+import com.example.cooing.domain.report.dto.*;
 import com.example.cooing.global.entity.*;
 import com.example.cooing.global.repository.*;
 import com.example.cooing.global.util.WeekOfMonthDto;
@@ -12,10 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.example.cooing.global.util.CalculateWeekAndDayUtil.calculateWeekToDay;
@@ -31,7 +27,7 @@ public class ReportService {
     private final UserRepository userRepository;
     private final AnswerRepository answerRepository;
 
-    public ArrayList<Boolean> getSecretNote(CustomUserDetails userDetail, Integer month, Integer week) {
+    public SecretNoteResponse getSecretNote(CustomUserDetails userDetail, Integer month, Integer week) {
         User user = userRepository.findByEmail(userDetail.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
 
@@ -40,7 +36,9 @@ public class ReportService {
         Report report = reportRepository.findByBabyIdAndMonthAndWeek(baby.getId(), month, week)
                 .orElseGet(() -> makeReport(baby, month, week));
 
-        return report.getSecretNote();
+        SecretNoteResponse secretNoteResponse = new SecretNoteResponse(report.getSecretNote());
+
+        return secretNoteResponse;
     }
 
     private Report makeReport(Baby baby, Integer month, Integer week) {
@@ -52,12 +50,7 @@ public class ReportService {
         //Todo 여기 유저나 베이비 검사 안해도 되는 find 문인지 의문!
 
 
-//        ArrayList<Boolean> secretNote = makeSecretNote(answers);
-        //임시 더미 데이터
-        ArrayList<Boolean> secretNote = new ArrayList<>();
-        for(int i = 0; i < 17; i++) {
-            secretNote.add(true);
-        }
+        ArrayList<Boolean> secretNote = makeSecretNote(answers);
 
         Map<String, Integer> frequentWords = makeFrequentWords(answers);
 
@@ -77,13 +70,32 @@ public class ReportService {
     private ArrayList<Boolean> makeSecretNote(List<Answer> answers) {
         ArrayList<Boolean> secretNote = new ArrayList<>();
 
-        ArrayList<Boolean> result1 = evaluateSentenceStructure(answers);
-        ArrayList<Boolean> result2 = evaluateMeaning(answers);
-        ArrayList<Boolean> result3 = evaluateMorps(answers);
+        List<Boolean> result1 = evaluateSentenceStructure(answers);
+        List<Boolean> result2 = evaluateMeaning(answers);
+        List<Boolean> result3 = evaluateMorps(answers);
 
-        secretNote.addAll(result1);
-        secretNote.addAll(result2);
-        secretNote.addAll(result3);
+        // 1단계 데이터
+        secretNote.add(result1.get(0));
+        secretNote.add(result2.get(0));
+        secretNote.add(result2.get(1));
+        secretNote.add(result2.get(2));
+        secretNote.add(result3.get(0));
+
+        // 2단계 데이터
+        secretNote.add(result1.get(1));
+        secretNote.add(result2.get(3));
+        secretNote.add(result2.get(4));
+        secretNote.add(result2.get(5));
+        secretNote.add(result3.get(1));
+        secretNote.add(result3.get(2));
+        secretNote.add(result3.get(3));
+
+        // 3단계 데이터
+        secretNote.add(result1.get(2));
+        secretNote.add(result2.get(6));
+        secretNote.add(result2.get(7));
+        secretNote.add(result3.get(4));
+        secretNote.add(result3.get(5));
 
         return secretNote;
     }
@@ -118,29 +130,136 @@ public class ReportService {
     }
 
     private ArrayList<Boolean> evaluateSentenceStructure(List<Answer> answers) {
+
+        int totalSentence = 0;
+        int totalWord = 0;
+
+        for (Answer answer: answers) {
+            String text = answer.getAnswerText();
+            String[] sentences = text.split("[\\.\\?!]\\s*");
+            totalSentence += sentences.length;
+
+            for (String sentence : sentences) {
+                String[] words = sentence.split("\\s+");
+                totalWord += words.length;
+            }
+        }
+
+        float avg = (float) totalWord / totalSentence;
         ArrayList<Boolean> result = new ArrayList<>();
 
-//        // 일주일동안 구사한 문장들의 평균 단어 수로 판단
-//
-//        String[] sentences = text.split("\\.\\s*");
-//
-//        // 각 문장의 단어 수를 계산하고 출력
-//        for (String sentence : sentences) {
-//            int wordCount = countWords(sentence);
-//            System.out.println("Words in sentence: \"" + sentence + "\": " + wordCount);
-//        }
+        if (avg < 1.5) {
+            result.add(true);
+            result.add(false);
+            result.add(false);
+        } else if (avg < 2.5) {
+            result.add(true);
+            result.add(true);
+            result.add(false);
+        }
+        else {
+            result.add(true);
+            result.add(true);
+            result.add(true);
+        }
 
         return result;
     }
 
-    private ArrayList<Boolean> evaluateMeaning(List<Answer> answers) {
-        ArrayList<Boolean> result = new ArrayList<>();
+    private List<Boolean> evaluateMeaning(List<Answer> answers) {
+        // 7번 관계어 처리는 추후 구현. 현재는 false로만 리턴.
+
+        List<Boolean> result = Arrays.asList(false, false, false, false, false, false, false, false);
+
+        for (Answer answer: answers) {
+            List<Map> morps = answer.getMorp();
+            for (Map morp: morps) {
+                String text = morp.get("morp").toString();
+                String type = morp.get("type").toString();
+
+                // 명사를 나타난다.
+                if (type.equals("NNP") || type.equals("NNG") || type.equals("NNB")) {
+                    result.set(0, true);
+                }
+
+                // 대명사가 나타난다.
+                else if (type.equals("NP")) {
+                    result.set(1, true);
+                    // 누구, 어디, 무엇 등 대명사인 의문사가 나타난다.
+                    if (text.equals("누구") || text.equals("어디") || text.equals("무엇")) {
+                        result.set(5, true);
+                    }
+                }
+
+                // 동사와 형용사가 나타난다.
+                else if (type.equals("VV") || type.equals("VA")) {
+                    result.set(2, true);
+                    // 복잡한 동사가 나타난다.
+                    if (text.length() >= 2) {
+                        result.set(3, true);
+                    }
+                    // 대명사 외의 의문사가 나타난다.
+                    if (text.equals("이렇") || text.equals("저렇") || text.equals("어떻")) {
+                        result.set(6, true);
+                    }
+                }
+
+                // 부사가 나타난다.
+                else if (type.equals("MAG") || type.equals("MAJ")) {
+                    result.set(4, true);
+                    // 대명사 외의 의문사가 나타난다.
+                    if (text.equals("왜")) {
+                        result.set(6, true);
+                    }
+                }
+
+            }
+        }
 
         return result;
     }
 
-    private ArrayList<Boolean> evaluateMorps(List<Answer> answers) {
-        ArrayList<Boolean> result = new ArrayList<>();
+    private List<Boolean> evaluateMorps(List<Answer> answers) {
+
+
+        List<Boolean> result = Arrays.asList(false, false, false, false, false, false);
+
+        for (Answer answer: answers) {
+            List<Map> morps = answer.getMorp();
+            for (Map morp: morps) {
+                String text = morp.get("morp").toString();
+                String type = morp.get("type").toString();
+
+                // 종결어미가 나타난다.
+                if (type.equals("EF")) {
+                    result.set(0, true);
+                    // 복잡한 종결어미가 나타난다.
+                    if (text.length() >= 2) {
+                        result.set(5, true);
+                    }
+                }
+
+                // 의존명사가 나타난다.
+                else if (type.equals("NNB")) {
+                    result.set(1, true);
+                }
+
+                // 주격 조사가 나타난다.
+                else if (type.equals("JKS")) {
+                    result.set(2, true);
+                }
+
+                // 보조사가 나타난다.
+                else if (type.equals("JX") || type.equals("JC")) {
+                    result.set(3, true);
+                }
+
+                // 연결어미가 나타난다
+                else if (type.equals("EC")) {
+                    result.set(4, true);
+                }
+            }
+        }
 
         return result;
     }
