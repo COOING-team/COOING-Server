@@ -31,7 +31,7 @@ public class CalculateWeekAndDayUtil {
         int month = date.getMonthValue();
         int weekOfMonth = getWeekOfMonth(date);
 
-        return new WeekOfMonthDto(year,month,weekOfMonth);
+        return new WeekOfMonthDto(year, month, weekOfMonth);
     }
 
     private static int getWeekOfMonth(LocalDate date) {
