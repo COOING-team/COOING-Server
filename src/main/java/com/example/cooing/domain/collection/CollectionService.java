@@ -3,8 +3,8 @@ package com.example.cooing.domain.collection;
 import static com.example.cooing.global.exception.CustomErrorCode.NO_ANSWER;
 import static com.example.cooing.global.exception.CustomErrorCode.NO_BABY;
 import static com.example.cooing.global.exception.CustomErrorCode.NO_QUESTION;
-import static com.example.cooing.global.util.DateUtil.getMonthEndDate;
-import static com.example.cooing.global.util.DateUtil.getMonthStartDate;
+import static com.example.cooing.global.util.CalculateYearAndMonthUtil.getMonthEndDate;
+import static com.example.cooing.global.util.CalculateYearAndMonthUtil.getMonthStartDate;
 
 import com.example.cooing.domain.auth.CustomUserDetails;
 import com.example.cooing.domain.collection.dto.AnswerResponseDto;

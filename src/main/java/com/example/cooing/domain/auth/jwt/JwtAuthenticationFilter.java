@@ -31,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       //토큰 필요 없는 것들은 여기에서 설정해야 함
 
       RequestURI.AUTH_URI + "kakao-login",
-
+      RequestURI.QUESTION_URI,
       "/swagger-ui/index.html",
       "/favicon.ico"
   };

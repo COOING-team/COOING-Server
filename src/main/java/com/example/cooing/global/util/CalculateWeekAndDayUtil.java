@@ -25,6 +25,24 @@ public class CalculateWeekAndDayUtil {
         return weekOfDays;
     }
 
+    //이건 년도 정보도 인자로 함께 받는 버전입니다.
+    public static ArrayList<LocalDate> calculateWeekToDay(Integer year, Integer month, Integer week) {
+        ArrayList<LocalDate> weekOfDays = new ArrayList<>();
+
+        LocalDate firstDayOfMonth = LocalDate.of(year, month, 1);
+
+        LocalDate firstMonday = firstDayOfMonth.with(TemporalAdjusters.firstInMonth(DayOfWeek.SUNDAY));
+
+        LocalDate result = firstMonday.plusWeeks(week - 1);
+
+        for (int i = 0; i < 7; i++) {
+            LocalDate currentDate = result.plusDays(i);
+            weekOfDays.add(currentDate);
+        }
+
+        return weekOfDays;
+    }
+
     public static WeekOfMonthDto getYearMonthWeekInfo(LocalDate date) {
 
         int year = date.getYear();

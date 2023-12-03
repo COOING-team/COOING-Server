@@ -17,5 +17,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
 
     Optional<Answer> findByCreateAt(LocalDateTime today);
 
+    Optional<Answer> findByCreateAtBetweenAndBabyId(LocalDateTime todayMin, LocalDateTime todayMax,
+                                                    Long babyId);
     Optional<Answer> findById(Long answerId);
 }

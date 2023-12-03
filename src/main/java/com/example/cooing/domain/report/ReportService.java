@@ -19,7 +19,19 @@ import static com.example.cooing.global.enums.NoteStatus.*;
 import static com.example.cooing.global.util.CalculateWeekAndDayUtil.calculateWeekToDay;
 import static com.example.cooing.global.util.CalculateWeekAndDayUtil.getYearMonthWeekInfo;
 import static com.example.cooing.global.util.CalculateWithBirthUtil.getMonthsSinceBirth;
-import static com.example.cooing.global.util.DateUtil.getTotalWeekOfMonth;
+import static com.example.cooing.global.util.CalculateYearAndMonthUtil.getTotalWeekOfMonth;
+
+import com.example.cooing.domain.report.dto.InfoResponseDto;
+import com.example.cooing.domain.report.dto.SecretNoteResponse;
+import com.example.cooing.domain.report.dto.TotalResponseDto;
+import com.example.cooing.domain.report.dto.UsingWordReponseDto;
+import com.example.cooing.domain.report.dto.WordCountPerDay;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -30,7 +42,8 @@ public class ReportService {
     private final UserRepository userRepository;
     private final AnswerRepository answerRepository;
 
-    public SecretNoteResponse getSecretNote(CustomUserDetails userDetail, Integer month, Integer week) {
+    public SecretNoteResponse getSecretNote(CustomUserDetails userDetail, Integer month,
+                                            Integer week) {
         User user = userRepository.findByEmail(userDetail.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
 
@@ -272,7 +285,6 @@ public class ReportService {
 
     private List<Boolean> evaluateMorps(List<Answer> answers) {
 
-
         List<Boolean> result = Arrays.asList(false, false, false, false, false, false);
 
         for (Answer answer : answers) {
@@ -340,6 +352,8 @@ public class ReportService {
 
         List<Report> allReports = reportRepository.findAllByBabyId(baby.getId());
 
+        System.out.println(allReports);
+
         Map<String, Integer> totalWords = new HashMap<>();
 
         // 모든 주차에 대한 빈도수를 누적
@@ -351,16 +365,88 @@ public class ReportService {
         // 누적된 빈도수 중 가장 많이 사용된 단어 선택
         Map.Entry<String, Integer> mostUsedWordEntry = getMostUsedWord(totalWords);
 
-        return TotalResponseDto.builder()
-                .totalWordNum(totalWords.size()) //Todo 여기 로직 수정 필요
-                .mostUseWord(mostUsedWordEntry.getKey())
-                .build();
+        System.out.println(totalWords.size());
+
+        if (mostUsedWordEntry != null) {
+            System.out.println(mostUsedWordEntry.getKey());
+
+            return TotalResponseDto.builder()
+                    .totalWordNum(totalWords.size())
+                    .mostUseWord(mostUsedWordEntry.getKey())
+                    .build();
+        } else {
+            // Handle the case where mostUsedWordEntry is null
+            // throw new CustomException(NO_YET_REPORT);
+            return TotalResponseDto.builder()
+                    .totalWordNum(0)
+                    .mostUseWord(null)
+                    .build();
+        }
     }
+
 
     private Map.Entry<String, Integer> getMostUsedWord(Map<String, Integer> wordCountMap) {
         return wordCountMap.entrySet()
                 .stream()
                 .max(Map.Entry.comparingByValue())
                 .orElse(null);
+    }
+
+
+    public UsingWordReponseDto getChart(CustomUserDetails userDetail, Integer year, Integer month,
+                                        Integer week) {
+        User user = userRepository.findByEmail(userDetail.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
+
+        Baby baby = user.getBabyList().get(0);
+
+        ArrayList<LocalDate> weekOfDays = calculateWeekToDay(year, month, week);
+
+        List<Answer> answers = answerRepository.findAllByCreateAtBetweenAndBabyId(
+                weekOfDays.get(0).atTime(LocalTime.MIN),
+                weekOfDays.get(6).atTime(LocalTime.MAX),
+                baby.getId()
+        );
+        System.out.println(weekOfDays.get(0) + weekOfDays.get(6).toString());
+
+        List<WordCountPerDay> wordCountList = new ArrayList<>();
+
+        for (LocalDate day : weekOfDays) {
+            int totalWordCount = answers.stream()
+                    .filter(answer -> answer.getCreateAt().toLocalDate().isEqual(day))
+                    .mapToInt(Answer::getWordCount)
+                    .sum();
+
+            wordCountList.add(new WordCountPerDay(day, totalWordCount));
+        }
+        System.out.println(wordCountList.get(0));
+        System.out.println(wordCountList.get(1));
+        System.out.println(wordCountList.get(2));
+        System.out.println(wordCountList.get(3));
+        System.out.println(wordCountList.get(4));
+        System.out.println(wordCountList.get(5));
+        System.out.println(wordCountList.get(6));
+
+
+        // Now you can use the wordCountList as needed
+        return UsingWordReponseDto.builder()
+                .averageWordNum(calculateAverageWordNum(wordCountList))
+                .wordNum(wordCountList)
+                .build();
+    }
+
+    private int calculateAverageWordNum(List<WordCountPerDay> wordCountList) {
+        // Filter out days with wordCount equal to 0
+        List<WordCountPerDay> nonZeroWordCountList = wordCountList.stream()
+                .filter(day -> day.getWordCount() > 0)
+                .collect(Collectors.toList());
+
+        // Calculate the total word count only for days with non-zero wordCount
+        int totalWordCount = nonZeroWordCountList.stream()
+                .mapToInt(WordCountPerDay::getWordCount)
+                .sum();
+
+        // Calculate the average only if there are non-zero wordCount days
+        return nonZeroWordCountList.isEmpty() ? 0 : totalWordCount / nonZeroWordCountList.size();
     }
 }
