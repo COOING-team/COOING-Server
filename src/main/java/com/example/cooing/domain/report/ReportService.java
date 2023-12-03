@@ -289,6 +289,8 @@ public class ReportService {
 
         List<Report> allReports = reportRepository.findAllByBabyId(baby.getId());
 
+        System.out.println(allReports);
+
         Map<String, Integer> totalWords = new HashMap<>();
 
         // 모든 주차에 대한 빈도수를 누적
@@ -300,11 +302,16 @@ public class ReportService {
         // 누적된 빈도수 중 가장 많이 사용된 단어 선택
         Map.Entry<String, Integer> mostUsedWordEntry = getMostUsedWord(totalWords);
 
+        System.out.println(totalWords.size());
+        System.out.println(mostUsedWordEntry.getKey());
+
         return TotalResponseDto.builder()
             .totalWordNum(totalWords.size()) //Todo 여기 로직 수정 필요
             .mostUseWord(mostUsedWordEntry.getKey())
             .build();
     }
+
+
 
     private Map.Entry<String, Integer> getMostUsedWord(Map<String, Integer> wordCountMap) {
         return wordCountMap.entrySet()
