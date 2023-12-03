@@ -3,10 +3,7 @@ package com.example.cooing.domain.report;
 import static com.example.cooing.global.RequestURI.REPORT_URI;
 
 import com.example.cooing.domain.auth.CustomUserDetails;
-import com.example.cooing.domain.report.dto.InfoResponseDto;
-import com.example.cooing.domain.report.dto.SecretNoteResponse;
-import com.example.cooing.domain.report.dto.TotalResponseDto;
-import com.example.cooing.domain.report.dto.UsingWordReponseDto;
+import com.example.cooing.domain.report.dto.*;
 import com.example.cooing.global.base.BaseResponseDto;
 import com.example.cooing.global.exception.CustomException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,14 +31,20 @@ public class ReportController {
 
     @GetMapping(value = "/info")
     @Operation(summary = "[레포트] 상단정보", description = "n월 n째주 쿠잉이의 주간 레포트 / 000, 태어난지 N개월쨰")
-    public BaseResponseDto<InfoResponseDto> getInfo(
-            @AuthenticationPrincipal CustomUserDetails userDetail) {
+    public BaseResponseDto<InfoResponseDto> getInfo(@AuthenticationPrincipal CustomUserDetails userDetail) {
         try {
             return BaseResponseDto.success("info 정보 조회 성공", reportService.getInfo(userDetail));
         } catch (CustomException e) {
             // 실패 시
             return BaseResponseDto.fail(e.getCustomErrorCode().getCode(), e.getMessage());
         }
+    }
+
+    @GetMapping(value = "/secret-note-list")
+    @Operation(summary = "해당 월의 시크릿 노트 목록", description = "")
+    public BaseResponseDto<SecretNoteListResponse> SecretNoteList(@AuthenticationPrincipal CustomUserDetails userDetail,
+                                                                  @RequestParam Integer month) {
+        return BaseResponseDto.success("ok", reportService.getSecretNoteList(userDetail, month));
     }
 
     @GetMapping(value = "/total")

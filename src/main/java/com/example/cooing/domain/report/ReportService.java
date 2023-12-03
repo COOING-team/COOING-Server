@@ -1,36 +1,37 @@
 package com.example.cooing.domain.report;
 
+import com.example.cooing.domain.auth.CustomUserDetails;
+import com.example.cooing.domain.report.dto.*;
+import com.example.cooing.global.entity.*;
+import com.example.cooing.global.enums.NoteStatus;
+import com.example.cooing.global.repository.*;
+import com.example.cooing.global.util.WeekOfMonthDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.example.cooing.global.enums.NoteStatus.*;
 import static com.example.cooing.global.util.CalculateWeekAndDayUtil.calculateWeekToDay;
 import static com.example.cooing.global.util.CalculateWeekAndDayUtil.getYearMonthWeekInfo;
 import static com.example.cooing.global.util.CalculateWithBirthUtil.getMonthsSinceBirth;
+import static com.example.cooing.global.util.CalculateYearAndMonthUtil.getTotalWeekOfMonth;
 
-import com.example.cooing.domain.auth.CustomUserDetails;
 import com.example.cooing.domain.report.dto.InfoResponseDto;
 import com.example.cooing.domain.report.dto.SecretNoteResponse;
 import com.example.cooing.domain.report.dto.TotalResponseDto;
 import com.example.cooing.domain.report.dto.UsingWordReponseDto;
 import com.example.cooing.domain.report.dto.WordCountPerDay;
-import com.example.cooing.global.entity.Answer;
-import com.example.cooing.global.entity.Baby;
-import com.example.cooing.global.entity.Report;
-import com.example.cooing.global.entity.User;
-import com.example.cooing.global.repository.AnswerRepository;
-import com.example.cooing.global.repository.ReportRepository;
-import com.example.cooing.global.repository.UserRepository;
-import com.example.cooing.global.util.WeekOfMonthDto;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
 
 
 @Service
@@ -56,14 +57,64 @@ public class ReportService {
         return secretNoteResponse;
     }
 
+    public SecretNoteListResponse getSecretNoteList(CustomUserDetails userDetail, Integer month) {
+        User user = userRepository.findByEmail(userDetail.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
+
+        Baby baby = user.getBabyList().get(0);
+
+        ArrayList<SecretNoteList> secretNoteLists = confirmSecretNoteStatus(baby.getId(), month);
+
+        SecretNoteListResponse secretNoteListResponse = new SecretNoteListResponse(secretNoteLists);
+
+        return secretNoteListResponse;
+    }
+
+    private ArrayList<SecretNoteList> confirmSecretNoteStatus(Long babyId, Integer month) {
+        ArrayList<SecretNoteList> secretNoteLists = new ArrayList<>();
+        Integer weekCount = getTotalWeekOfMonth(month);
+
+        for (int i = 1; i <= weekCount; i++) {
+            NoteStatus noteStatus = verifyReportStatue(babyId, month, i);
+
+            SecretNoteList secretNoteList = SecretNoteList.builder()
+                    .noteStatus(noteStatus)
+                    .month(month)
+                    .week(i)
+                    .build();
+            secretNoteLists.add(secretNoteList);
+        }
+
+        return secretNoteLists;
+    }
+
+    private NoteStatus verifyReportStatue(Long babyId, Integer month, Integer week) {
+        Optional<Report> report = reportRepository.findByBabyIdAndMonthAndWeek(babyId, month, week);
+
+        if (report.isPresent()) {
+            return READABLE;
+        } else {
+            ArrayList<LocalDate> dayOfWeek = calculateWeekToDay(month, week);
+            List<Answer> answers =
+                    answerRepository.findAllByCreateAtBetweenAndBabyId(dayOfWeek.get(0).atTime(LocalTime.MIN),
+                            dayOfWeek.get(6).atTime(LocalTime.MAX), babyId);
+
+            if (answers.size() >= 3) {
+                return CREATABLE;
+            } else {
+                return NOT_CREATABLE;
+            }
+        }
+    }
+
     private Report makeReport(Baby baby, Integer month, Integer week) {
 
         ArrayList<LocalDate> daysOfWeek = calculateWeekToDay(month, week);
 
         List<Answer> answers = answerRepository
-                .findAllByCreateAtBetween(daysOfWeek.get(0).atTime(LocalTime.MIN),
-                        daysOfWeek.get(6).atTime(LocalTime.MIN));
-        //Todo 여기 유저나 베이비 검사 안해도 되는 find 문인지 의문!
+                .findAllByCreateAtBetweenAndBabyId(daysOfWeek.get(0).atTime(LocalTime.MIN),
+                        daysOfWeek.get(6).atTime(LocalTime.MAX),
+                        baby.getId());
 
         ArrayList<Boolean> secretNote = makeSecretNote(answers);
 
