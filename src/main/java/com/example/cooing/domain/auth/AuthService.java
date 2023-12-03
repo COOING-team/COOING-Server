@@ -15,6 +15,7 @@ import com.example.cooing.global.exception.CustomException;
 import com.example.cooing.global.repository.BabyRepository;
 import com.example.cooing.global.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -71,17 +72,21 @@ public class AuthService {
     User user = userRepository.findByEmail(userDetails.getEmail())
         .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
 
-    Baby baby = user.getBabyList().get(0); //Todo 아이 한명 이상이면 이 부분을 수정하세요
-//    Baby baby = babyRepository.findByUserId(user.getId())
-//        .orElseThrow(() -> new CustomException(NO_BABY));
+    List<Baby> babyList = user.getBabyList();
 
-    return InfoResponseDto.builder()
-        .name(baby.getName())
-        .age(getAge(baby.getBirth()))
-        .month(getMonthsSinceBirth(baby.getBirth()))
-        .birth(baby.getBirth())
-        .sex(baby.getSex())
-        .build();
+    if (babyList.isEmpty()) {
+      // Throw a custom exception when there is no baby in the list
+      throw new CustomException(NO_BABY);
+    }else{
+      Baby baby = user.getBabyList().get(0); //Todo 아이 한명 이상이면 이 부분을 수정하세요
+      return InfoResponseDto.builder()
+          .name(baby.getName())
+          .age(getAge(baby.getBirth()))
+          .month(getMonthsSinceBirth(baby.getBirth()))
+          .birth(baby.getBirth())
+          .sex(baby.getSex())
+          .build();
+    }
   }
 
 

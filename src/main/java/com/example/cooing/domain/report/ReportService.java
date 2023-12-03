@@ -1,22 +1,32 @@
 package com.example.cooing.domain.report;
 
-import com.example.cooing.domain.auth.CustomUserDetails;
-import com.example.cooing.domain.report.dto.*;
-import com.example.cooing.global.entity.*;
-import com.example.cooing.global.repository.*;
-import com.example.cooing.global.util.WeekOfMonthDto;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import static com.example.cooing.global.util.CalculateWeekAndDayUtil.calculateWeekToDay;
 import static com.example.cooing.global.util.CalculateWeekAndDayUtil.getYearMonthWeekInfo;
 import static com.example.cooing.global.util.CalculateWithBirthUtil.getMonthsSinceBirth;
+
+import com.example.cooing.domain.auth.CustomUserDetails;
+import com.example.cooing.domain.report.dto.InfoResponseDto;
+import com.example.cooing.domain.report.dto.SecretNoteResponse;
+import com.example.cooing.domain.report.dto.TotalResponseDto;
+import com.example.cooing.global.entity.Answer;
+import com.example.cooing.global.entity.Baby;
+import com.example.cooing.global.entity.Report;
+import com.example.cooing.global.entity.User;
+import com.example.cooing.global.repository.AnswerRepository;
+import com.example.cooing.global.repository.ReportRepository;
+import com.example.cooing.global.repository.UserRepository;
+import com.example.cooing.global.util.WeekOfMonthDto;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
 
 @Service
@@ -289,6 +299,8 @@ public class ReportService {
 
         List<Report> allReports = reportRepository.findAllByBabyId(baby.getId());
 
+        System.out.println(allReports);
+
         Map<String, Integer> totalWords = new HashMap<>();
 
         // 모든 주차에 대한 빈도수를 누적
@@ -300,11 +312,26 @@ public class ReportService {
         // 누적된 빈도수 중 가장 많이 사용된 단어 선택
         Map.Entry<String, Integer> mostUsedWordEntry = getMostUsedWord(totalWords);
 
-        return TotalResponseDto.builder()
-            .totalWordNum(totalWords.size()) //Todo 여기 로직 수정 필요
-            .mostUseWord(mostUsedWordEntry.getKey())
-            .build();
+        System.out.println(totalWords.size());
+
+        if (mostUsedWordEntry != null) {
+            System.out.println(mostUsedWordEntry.getKey());
+
+            return TotalResponseDto.builder()
+                .totalWordNum(totalWords.size())
+                .mostUseWord(mostUsedWordEntry.getKey())
+                .build();
+        } else {
+            // Handle the case where mostUsedWordEntry is null
+            // throw new CustomException(NO_YET_REPORT);
+            return TotalResponseDto.builder()
+                .totalWordNum(0)
+                .mostUseWord(null)
+                .build();
+        }
     }
+
+
 
     private Map.Entry<String, Integer> getMostUsedWord(Map<String, Integer> wordCountMap) {
         return wordCountMap.entrySet()
