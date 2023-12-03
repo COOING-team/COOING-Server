@@ -13,4 +13,5 @@ public class HomeResponseDto {
 
   private final int month;
   private final int cooingDay;
+  private final boolean isTodayRecord;
 }

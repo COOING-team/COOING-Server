@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping(QUESTION_URI)
@@ -35,7 +36,7 @@ public class QuestionController {
     }
   }
   @GetMapping(value = "/{cooingIndex}")
-  @Operation(summary = "해당 질문 반환", description = "홈에 있는 cooingDay에 +1 한 값을 입력하면 그 다음 질문 번호가 되겠죠?")
+  @Operation(summary = "[홈] 해당 질문 반환", description = "홈에 있는 cooingDay에 +1 한 값을 입력하면 그 다음 질문 번호가 되겠죠?")
   public BaseResponseDto<QuestionResponseDto> getQuestion(@PathVariable("cooingIndex") Long cooingIndex) {
     try {
       QuestionResponseDto questionResponseDto = questionService.getQuestion(cooingIndex);
@@ -48,7 +49,7 @@ public class QuestionController {
   @PostMapping(value = "/create")
   @Operation(summary = "해당 질문 추가", description = "질문을 만들어요")
   public BaseResponseDto<QuestionResponseDto> saveQuestion(
-      CreateQuestionRequest createQuestionRequest) {
+      @RequestParam("createQuestionRequest") CreateQuestionRequest createQuestionRequest) {
     try {
       QuestionResponseDto questionResponseDto = questionService.createQuestion(createQuestionRequest);
       return BaseResponseDto.success("질문 저장 성공", questionResponseDto);

@@ -1,16 +1,21 @@
 package com.example.cooing.global.entity;
 
 import io.hypersistence.utils.hibernate.type.json.JsonType;
-import jakarta.persistence.*;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import lombok.*;
-import org.hibernate.annotations.Type;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Getter
@@ -27,8 +32,8 @@ public class Answer {
     @Column(name = "baby_id") // baby 테이블과 매핑
     private Long babyId;
 
-    @Column(name = "question_id") // 질문 테이블과 매핑
-    private Long questionId;
+    @Column(name = "cooing_index") // 질문 테이블과 매핑
+    private Long cooingIndex;
 
     @Column(name = "file_url")
     private String fileUrl;

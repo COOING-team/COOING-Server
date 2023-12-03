@@ -43,7 +43,7 @@ public class AuthController {
   }
 
   @GetMapping("/baby")
-  @Operation(summary = "아이 정보 조회 [마이페이지]", description = "토큰O.")
+  @Operation(summary = "[마이페이지] 아이 정보 조회", description = "토큰O.")
   public BaseResponseDto<InfoResponseDto> MyInfo(
       @AuthenticationPrincipal CustomUserDetails userDetail) {
     try {

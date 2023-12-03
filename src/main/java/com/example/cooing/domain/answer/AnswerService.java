@@ -52,13 +52,11 @@ public class AnswerService {
     return filePath;
   }
 
-  public String createAnswer(CustomUserDetails userDetails, CreateAnswerRequest createAnswerRequest) {
+  public String createAnswer(CustomUserDetails userDetails, CreateAnswerRequest createAnswerRequest, Long cooingIndex) {
 
     User user = userRepository.findByEmail(userDetails.getEmail())
         .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
 
-
-    Long questionId = 1L; // 임시 값
 
     List<Map> responseBody = analysisRequest(createAnswerRequest.getAnswerText());
 
@@ -69,8 +67,8 @@ public class AnswerService {
 
     try {
       Answer answer = Answer.builder()
-          .babyId(user.getBabyList().get(0).getId())
-          .questionId(questionId)
+          .babyId(user.getBabyList().get(0).getId()) //Todo 아이수 확장되면 여기 하드코딩 수정하기
+          .cooingIndex(cooingIndex)
           .fileUrl(createAnswerRequest.getFileUrl())
           .answerText(createAnswerRequest.getAnswerText())
           .comment(createAnswerRequest.getComment())
