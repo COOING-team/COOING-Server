@@ -1,32 +1,38 @@
 package com.example.cooing.domain.answer;
 
 import static com.example.cooing.global.exception.CustomErrorCode.NO_BABY;
-import static com.example.cooing.global.util.CalculateWithBirthUtil.getMonthsSinceBirth;
+import static com.example.cooing.global.exception.CustomErrorCode.NO_QUESTION;
 
+import com.example.cooing.domain.answer.dto.CreateAnswerRequest;
 import com.example.cooing.domain.auth.CustomUserDetails;
-import com.example.cooing.domain.home.dto.HomeResponseDto;
 import com.example.cooing.global.entity.Answer;
 import com.example.cooing.global.entity.Baby;
 import com.example.cooing.global.entity.User;
 import com.example.cooing.global.exception.CustomException;
 import com.example.cooing.global.repository.AnswerRepository;
+import com.example.cooing.global.repository.QuestionRepository;
 import com.example.cooing.global.repository.UserRepository;
 import com.google.gson.Gson;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import com.example.cooing.domain.answer.dto.CreateAnswerRequest;
-
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.time.LocalDateTime;
-import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +45,7 @@ public class AnswerService {
     private String accessKey;
 
     private final AnswerRepository answerRepository;
+    private final QuestionRepository questionRepository;
     private final UserRepository userRepository;
 
 
@@ -65,6 +72,9 @@ public class AnswerService {
 
         User user = userRepository.findByEmail(userDetails.getEmail())
             .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
+
+        questionRepository.findByCooingIndex(cooingIndex)
+            .orElseThrow(() -> new CustomException(NO_QUESTION));
 
         List<Map> responseBody = analysisRequest(createAnswerRequest.getAnswerText());
 
