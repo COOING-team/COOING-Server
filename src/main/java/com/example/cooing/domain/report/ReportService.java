@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 @Service
 @RequiredArgsConstructor
 public class ReportService {
@@ -68,6 +67,26 @@ public class ReportService {
         SecretNoteListResponse secretNoteListResponse = new SecretNoteListResponse(secretNoteLists);
 
         return secretNoteListResponse;
+    }
+
+    public FrequentWordResponse getFrequentWords(CustomUserDetails userDetail) {
+        User user = userRepository.findByEmail(userDetail.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
+
+        Baby baby = user.getBabyList().get(0);
+
+        List <Report> reports = reportRepository.findAllByBabyId(baby.getId());
+
+        if (reports.isEmpty()) {
+            return new FrequentWordResponse(new HashMap<String, Integer>());
+        }
+
+        // 효율성 좀 더 고민해보기
+        // 레포트에 year 컬럼 추후 추가 검토
+        Collections.sort(reports, Comparator.comparing(Report::getMonth, Comparator.reverseOrder())
+                .thenComparing(Report::getWeek, Comparator.reverseOrder()));
+
+        return new FrequentWordResponse(reports.get(0).getFrequentWords());
     }
 
     private ArrayList<SecretNoteList> confirmSecretNoteStatus(Long babyId, Integer month) {
