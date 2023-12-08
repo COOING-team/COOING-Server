@@ -48,11 +48,11 @@ public class Answer {
     private Integer wordCount;
 
     @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb", name = "morp_result")
+    @Column(columnDefinition = "json", name = "morp_result")
     private List<Map> morp = new ArrayList<>();
 
     @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb", name = "word_result")
+    @Column(columnDefinition = "json", name = "word_result")
     private List<Map> word = new ArrayList<>();
 
     @Column(name = "create_at")
