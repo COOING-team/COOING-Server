@@ -32,11 +32,11 @@ public class Report {
     private Integer week;
 
     @Type(ListArrayType.class)
-    @Column(columnDefinition = "boolean[]", name = "secret_note")
+    @Column(columnDefinition = "json", name = "secret_note")
     private ArrayList<Boolean> secretNote;
 
     @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb", name = "frequent_words")
+    @Column(columnDefinition = "json", name = "frequent_words")
     private Map<String, Integer> frequentWords = new HashMap<>();
 
 }
