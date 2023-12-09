@@ -78,7 +78,11 @@ public class ReportService {
         List <Report> reports = reportRepository.findAllByBabyId(baby.getId());
 
         if (reports.isEmpty()) {
-            return new FrequentWordResponse(new HashMap<String, Integer>());
+            HashMap<String, Integer> wordMap = new HashMap<String, Integer>();
+            for (int i = 0; i < 5; i++) {
+                wordMap.put(null, 0);
+            }
+            return new FrequentWordResponse(wordMap);
         }
 
         // 효율성 좀 더 고민해보기
@@ -86,7 +90,15 @@ public class ReportService {
         Collections.sort(reports, Comparator.comparing(Report::getMonth, Comparator.reverseOrder())
                 .thenComparing(Report::getWeek, Comparator.reverseOrder()));
 
-        return new FrequentWordResponse(reports.get(0).getFrequentWords());
+        Map<String, Integer> wordMap = reports.get(0).getFrequentWords();
+
+        if (wordMap.size() < 5) {
+            for (int i = 1; i <= 5 - wordMap.size(); i++) {
+                wordMap.put(null, 0);
+            }
+        }
+
+        return new FrequentWordResponse(wordMap);
     }
 
     private ArrayList<SecretNoteList> confirmSecretNoteStatus(Long babyId, Integer month) {
