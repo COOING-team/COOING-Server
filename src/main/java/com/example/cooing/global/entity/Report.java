@@ -8,7 +8,6 @@ import org.hibernate.annotations.Type;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Entity
@@ -31,9 +30,9 @@ public class Report {
     @Column(name = "week")
     private Integer week;
 
-    @Type(ListArrayType.class)
+    @Type(JsonType.class)
     @Column(columnDefinition = "json", name = "secret_note")
-    private ArrayList<Boolean> secretNote;
+    private Map<String, Boolean> secretNote;
 
     @Type(JsonType.class)
     @Column(columnDefinition = "json", name = "frequent_words")

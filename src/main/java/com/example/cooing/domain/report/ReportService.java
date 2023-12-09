@@ -78,7 +78,11 @@ public class ReportService {
         List <Report> reports = reportRepository.findAllByBabyId(baby.getId());
 
         if (reports.isEmpty()) {
-            return new FrequentWordResponse(new HashMap<String, Integer>());
+            HashMap<String, Integer> wordMap = new HashMap<String, Integer>();
+            for (int i = 0; i < 5; i++) {
+                wordMap.put("none" + String.valueOf(i), -1);
+            }
+            return new FrequentWordResponse(wordMap);
         }
 
         // 효율성 좀 더 고민해보기
@@ -86,7 +90,15 @@ public class ReportService {
         Collections.sort(reports, Comparator.comparing(Report::getMonth, Comparator.reverseOrder())
                 .thenComparing(Report::getWeek, Comparator.reverseOrder()));
 
-        return new FrequentWordResponse(reports.get(0).getFrequentWords());
+        Map<String, Integer> wordMap = reports.get(0).getFrequentWords();
+
+        if (wordMap.size() < 5) {
+            for (int i = 0; i < 5 - wordMap.size(); i++) {
+                wordMap.put("none" + String.valueOf(i), -1);
+            }
+        }
+
+        return new FrequentWordResponse(wordMap);
     }
 
     private ArrayList<SecretNoteList> confirmSecretNoteStatus(Long babyId, Integer month) {
@@ -135,7 +147,7 @@ public class ReportService {
                         daysOfWeek.get(6).atTime(LocalTime.MAX),
                         baby.getId());
 
-        ArrayList<Boolean> secretNote = makeSecretNote(answers);
+        Map<String, Boolean> secretNote = makeSecretNote(answers);
 
         Map<String, Integer> frequentWords = makeFrequentWords(answers);
 
@@ -152,35 +164,35 @@ public class ReportService {
         return report;
     }
 
-    private ArrayList<Boolean> makeSecretNote(List<Answer> answers) {
-        ArrayList<Boolean> secretNote = new ArrayList<>();
+    private Map<String, Boolean> makeSecretNote(List<Answer> answers) {
+        Map<String, Boolean> secretNote = new HashMap<>();
 
         List<Boolean> result1 = evaluateSentenceStructure(answers);
         List<Boolean> result2 = evaluateMeaning(answers);
         List<Boolean> result3 = evaluateMorps(answers);
 
         // 1단계 데이터
-        secretNote.add(result1.get(0));
-        secretNote.add(result2.get(0));
-        secretNote.add(result2.get(1));
-        secretNote.add(result2.get(2));
-        secretNote.add(result3.get(0));
+        secretNote.put("1", result1.get(0));
+        secretNote.put("2", result2.get(0));
+        secretNote.put("3", result2.get(1));
+        secretNote.put("4", result2.get(2));
+        secretNote.put("5", result3.get(0));
 
         // 2단계 데이터
-        secretNote.add(result1.get(1));
-        secretNote.add(result2.get(3));
-        secretNote.add(result2.get(4));
-        secretNote.add(result2.get(5));
-        secretNote.add(result3.get(1));
-        secretNote.add(result3.get(2));
-        secretNote.add(result3.get(3));
+        secretNote.put("6", result1.get(1));
+        secretNote.put("7", result2.get(3));
+        secretNote.put("8", result2.get(4));
+        secretNote.put("9", result2.get(5));
+        secretNote.put("10", result3.get(1));
+        secretNote.put("11", result3.get(2));
+        secretNote.put("12", result3.get(3));
 
         // 3단계 데이터
-        secretNote.add(result1.get(2));
-        secretNote.add(result2.get(6));
-        secretNote.add(result2.get(7));
-        secretNote.add(result3.get(4));
-        secretNote.add(result3.get(5));
+        secretNote.put("13", result1.get(2));
+        secretNote.put("14", result2.get(6));
+        secretNote.put("15", result2.get(7));
+        secretNote.put("16", result3.get(4));
+        secretNote.put("17", result3.get(5));
 
         return secretNote;
     }
