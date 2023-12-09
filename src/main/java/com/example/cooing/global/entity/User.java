@@ -48,7 +48,8 @@ public class User implements UserDetails {
 
 
     @Builder
-    public User(Long id, String email, Role role, String name, OAuthProvider oAuthProvider, String providerId) {
+    public User(Long id, String email, Role role, String name, OAuthProvider oAuthProvider,
+        String providerId) {
         this.id = id;
         this.email = email;
         this.name = name;
@@ -57,7 +58,7 @@ public class User implements UserDetails {
 //        this.providerId = providerId;
     }
 
-    public void updateRole(Role role){
+    public void updateRole(Role role) {
         this.role = role;
     }
 
