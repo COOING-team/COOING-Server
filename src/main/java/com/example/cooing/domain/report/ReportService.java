@@ -80,7 +80,7 @@ public class ReportService {
         if (reports.isEmpty()) {
             HashMap<String, Integer> wordMap = new HashMap<String, Integer>();
             for (int i = 0; i < 5; i++) {
-                wordMap.put(null, 0);
+                wordMap.put("none" + String.valueOf(i), -1);
             }
             return new FrequentWordResponse(wordMap);
         }
@@ -93,8 +93,8 @@ public class ReportService {
         Map<String, Integer> wordMap = reports.get(0).getFrequentWords();
 
         if (wordMap.size() < 5) {
-            for (int i = 1; i <= 5 - wordMap.size(); i++) {
-                wordMap.put(null, 0);
+            for (int i = 0; i < 5 - wordMap.size(); i++) {
+                wordMap.put("none" + String.valueOf(i), -1);
             }
         }
 
