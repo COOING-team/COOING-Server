@@ -35,8 +35,8 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private OAuthProvider oAuthProvider;
 
-    @Column(nullable = false)
-    private String providerId;
+//    @Column(nullable = false)
+//    private String providerId;
 
     @Enumerated(EnumType.STRING)
 //    @Column(nullable = false)
@@ -54,7 +54,7 @@ public class User implements UserDetails {
         this.name = name;
         this.oAuthProvider = oAuthProvider;
         this.role = role;
-        this.providerId = providerId;
+//        this.providerId = providerId;
     }
 
     public void updateRole(Role role){

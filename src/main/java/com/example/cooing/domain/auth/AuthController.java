@@ -26,12 +26,20 @@ public class AuthController {
 
   private final AuthService authService;
 
-  @PostMapping("/kakao-login")
+  @PostMapping("/login")
   @Synchronized
-  @Operation(summary = "카카오 로그인", description = "토큰X. RequestDto를 넣으면 넣으면 JWT AccessToken이 나옵니다.")
+  @Operation(summary = "카카오 로그인", description = "토큰X. RequestDto를 넣으면 넣으면 JWT AccessToken이 나옵니다. oAuthProvider 예시 값 APPLE / KAKAO")
   public synchronized BaseResponseDto<LoginResponseDto> loginKakao(
       @RequestBody LoginRequest loginRequest) {
-    return BaseResponseDto.success("로그인 성공", authService.login(loginRequest));
+    try {
+      LoginResponseDto loginResponseDto = authService.login(loginRequest);
+
+      return BaseResponseDto.success("로그인 성공", loginResponseDto);
+    } catch (CustomException e) {
+      // 실패 시
+      return BaseResponseDto.fail(e.getCustomErrorCode().getCode(), e.getMessage());
+    }
+
   }
 
   @PostMapping("/baby")

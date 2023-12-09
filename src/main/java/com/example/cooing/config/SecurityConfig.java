@@ -56,9 +56,8 @@ public class SecurityConfig {
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer() {
     return (web) -> web.ignoring()
-        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**"
-            , "/sign/**", "/product/**", "/auth/**", "/image/**", "/artist/**",
-            RequestURI.AUTH_URI);
+        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**",
+            RequestURI.AUTH_URI);리
   }
 
 

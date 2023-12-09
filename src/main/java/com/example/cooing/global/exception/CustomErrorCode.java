@@ -10,6 +10,7 @@ public enum CustomErrorCode {
   FAIL(-1, "실패"),
   CONCURRENCY_ISSUE_DETECTED(-2, "동시성 문제가 발생하였습니다. 재시도해주세요"),
 
+  EXIST_EMAIL(2001, "해당 이메일로 이미 가입한 유저입니다."),
 
   // mypage
   NO_BABY(3001, "아이를 등록하지 않았습니다."),
