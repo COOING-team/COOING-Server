@@ -70,6 +70,8 @@ public class ReportService {
     }
 
     public FrequentWordResponse getFrequentWords(CustomUserDetails userDetail) {
+        List<String> orderStrings = Arrays.asList("firstWord", "secondWord", "thirdWord", "fourthWord", "fifthWord");
+
         User user = userRepository.findByEmail(userDetail.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
 
@@ -78,9 +80,10 @@ public class ReportService {
         List <Report> reports = reportRepository.findAllByBabyId(baby.getId());
 
         if (reports.isEmpty()) {
-            HashMap<String, Integer> wordMap = new HashMap<String, Integer>();
+            HashMap<String, FrequentWordInfo> wordMap = new HashMap<String, FrequentWordInfo>();
             for (int i = 0; i < 5; i++) {
-                wordMap.put("none" + String.valueOf(i), -1);
+                FrequentWordInfo frequentWordInfo = new FrequentWordInfo("none", -1);
+                wordMap.put(orderStrings.get(i), frequentWordInfo);
             }
             return new FrequentWordResponse(wordMap);
         }
@@ -90,11 +93,31 @@ public class ReportService {
         Collections.sort(reports, Comparator.comparing(Report::getMonth, Comparator.reverseOrder())
                 .thenComparing(Report::getWeek, Comparator.reverseOrder()));
 
-        Map<String, Integer> wordMap = reports.get(0).getFrequentWords();
+        Map<String, Integer> frequentWords = reports.get(0).getFrequentWords();
+
+        ArrayList<FrequentWordInfo> frequentWordInfos = new ArrayList<>();
+        for (String key: frequentWords.keySet()) {
+            FrequentWordInfo frequentWordInfo = new FrequentWordInfo(key, frequentWords.get(key));
+            frequentWordInfos.add(frequentWordInfo);
+        }
+
+        Collections.sort(frequentWordInfos, new Comparator<FrequentWordInfo>() {
+            @Override
+            public int compare(FrequentWordInfo o1, FrequentWordInfo o2) {
+                // 내림차순 정렬
+                return Integer.compare(o2.getCount(), o1.getCount());
+            }
+        });
+
+        HashMap<String, FrequentWordInfo> wordMap = new HashMap<String, FrequentWordInfo>();
+        for (int i = 0; i < 5; i++) {
+            wordMap.put(orderStrings.get(i), frequentWordInfos.get(i));
+        }
 
         if (wordMap.size() < 5) {
-            for (int i = 0; i < 5 - wordMap.size(); i++) {
-                wordMap.put("none" + String.valueOf(i), -1);
+            for (int i = wordMap.size(); i < 5; i++) {
+                FrequentWordInfo frequentWordInfo = new FrequentWordInfo("none", -1);
+                wordMap.put(orderStrings.get(i), frequentWordInfo);
             }
         }
 
