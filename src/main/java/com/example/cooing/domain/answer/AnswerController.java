@@ -12,6 +12,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 import static com.example.cooing.global.RequestURI.ANSWER_URI;
 
 @RequestMapping(ANSWER_URI)
@@ -24,9 +26,8 @@ public class AnswerController {
     @PostMapping(value = "/save-audio", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "음성 파일 저장", description = "음성파일을 서버에 저장하고 파일이 저장 된 경로를 리턴합니다.")
     public BaseResponseDto<String> saveAudioFile(
-        @RequestParam("audioFile") MultipartFile multipartFile) {
-        return BaseResponseDto.success("멀티파트 저장 완료",
-            answerService.saveFileToStorage(multipartFile));
+        @RequestParam("audioFile") MultipartFile multipartFile) throws IOException {
+        return BaseResponseDto.success("멀티파트 저장 완료", answerService.saveFileToStorage(multipartFile));
     }
 
     @PostMapping("/create/{cooingIndex}")

@@ -3,6 +3,14 @@ package com.example.cooing.domain.answer;
 import static com.example.cooing.global.exception.CustomErrorCode.NO_BABY;
 import static com.example.cooing.global.exception.CustomErrorCode.NO_QUESTION;
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.InitiateMultipartUploadRequest;
+import com.amazonaws.services.s3.model.InitiateMultipartUploadResult;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.example.cooing.domain.answer.dto.CreateAnswerRequest;
 import com.example.cooing.domain.auth.CustomUserDetails;
 import com.example.cooing.global.entity.Answer;
@@ -44,27 +52,30 @@ public class AnswerService {
     @Value("${openapi.key}")
     private String accessKey;
 
+    private final AmazonS3 amazonS3;
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
+
     private final AnswerRepository answerRepository;
     private final QuestionRepository questionRepository;
     private final UserRepository userRepository;
 
 
-    public String saveFileToStorage(MultipartFile multipartFile) {
-        // 우선은 서버 로컬에 저장하고, 계정 문제 해결되면 외부 스토리지
+    public String saveFileToStorage(MultipartFile multipartFile) throws IOException {
 
         String originalFileName = multipartFile.getOriginalFilename();
         String fileExtension = StringUtils.getFilenameExtension(originalFileName);
         String fileName = "cooing-" + UUID.randomUUID() + "." + fileExtension;
 
-        String filePath = uploadDirectory + File.separator + fileName;
+        String path = "audio/" + fileName;
 
-        try {
-            multipartFile.transferTo(new File(filePath));
-        } catch (IOException e) {
-            return e.getStackTrace()[0].toString();
-        }
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(multipartFile.getSize());
+        metadata.setContentType(multipartFile.getContentType());
 
-        return filePath;
+        amazonS3.putObject(bucket, path, multipartFile.getInputStream(), metadata);
+        return amazonS3.getUrl(bucket, path).toString();
     }
 
     public String createAnswer(CustomUserDetails userDetails,
