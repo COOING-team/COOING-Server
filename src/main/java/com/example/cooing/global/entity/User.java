@@ -43,7 +43,7 @@ public class User implements UserDetails {
     private Role role; //USER(=Non Artist), ADMIN, ARTIST로 정의
 
     @JoinColumn(name = "user_id")
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Baby> babyList;
 
 

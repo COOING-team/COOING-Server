@@ -13,11 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping(AUTH_URI)
 @RestController
@@ -64,6 +60,12 @@ public class AuthController {
             // 실패 시
             return BaseResponseDto.fail(e.getCustomErrorCode().getCode(), e.getMessage());
         }
+    }
+
+    @DeleteMapping("/delete-account")
+    @Operation(summary = "회원 탈퇴")
+    public BaseResponseDto<String> deleteAccount(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return BaseResponseDto.success(authService.deleteAccount(userDetails));
     }
 
 }
