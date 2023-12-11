@@ -37,7 +37,11 @@ public class Baby {
     private LocalDateTime createAt;
 
     @JoinColumn(name = "baby_id")
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Report> reportList;
+
+    @JoinColumn(name = "baby_id")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<Answer> answerLists;
 
 }
