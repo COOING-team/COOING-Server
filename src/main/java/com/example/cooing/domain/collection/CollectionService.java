@@ -38,18 +38,24 @@ public class CollectionService {
     User user = userRepository.findByEmail(userDetail.getEmail())
         .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
 
-    Baby baby = babyRepository.findByUserId(user.getId())
-        .orElseThrow(() -> new CustomException(NO_BABY));
+//    Baby baby = babyRepository.findByUserId(user.getId())
+//        .orElseThrow(() -> new CustomException(NO_BABY));
 
-    List<Answer> answerList = answerRepository.findAllByCreateAtBetweenAndBabyId(
-        getMonthStartDate(year, month), getMonthEndDate(year, month), baby.getId());
+    if (user.getBabyList().isEmpty()) {
+      throw new CustomException(NO_BABY);
+    } else {
+      Baby baby = user.getBabyList().get(0); //Todo 베이비 0으로 고정
 
-    // Answer 엔터티를 MonthlyAnswerDto로 변환
-    List<MonthlyAnswerDto> monthlyAnswerDtoList = answerList.stream()
-        .map(MonthlyAnswerDto::fromAnswer)
-        .collect(Collectors.toList());
+      List<Answer> answerList = answerRepository.findAllByCreateAtBetweenAndBabyId(
+          getMonthStartDate(year, month), getMonthEndDate(year, month), baby.getId());
 
-    return monthlyAnswerDtoList;
+      // Answer 엔터티를 MonthlyAnswerDto로 변환
+      List<MonthlyAnswerDto> monthlyAnswerDtoList = answerList.stream()
+          .map(MonthlyAnswerDto::fromAnswer)
+          .collect(Collectors.toList());
+
+      return monthlyAnswerDtoList;
+    }
   }
 
   public AnswerResponseDto getAnswer(Long answerId) {

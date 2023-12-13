@@ -20,7 +20,7 @@ public enum CustomErrorCode {
   EXIST_QUESTION(4002,"이미 존재하는 쿠잉이 질문입니다."),
 
   //answer
-  NO_ANSWER(5001, "해당 답변이에없습니다."),
+  NO_ANSWER(5001, "해당 답변이 없습니다."),
 
   //report
   NO_YET_REPORT(6001,"레포트가 생성되지 않아 레포트 요약 정보를 반환할 수 없습니다.");
