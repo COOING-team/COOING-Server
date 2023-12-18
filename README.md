@@ -1,5 +1,27 @@
 # COOING-Server
 
+## 👩‍💻 Server Engineers
+| 유진 | 국혜경 |
+|:--------:|:-------:| 
+|<img width="150" src="https://github.com/objet-team/objet-backend/assets/94737714/7a0a7377-9533-43da-814b-3118cbe47a40">| <img width="150" src = "https://github.com/objet-team/objet-backend/assets/94737714/b7fc017c-7c90-4056-b9dd-049b7f994322"> |
+| [HI-JIN2](https://github.com/HI-JIN2) | [k0000k](https://github.com/k0000k)  |
+
+
+## 🛠 Tech Stacks
+<table>
+	<tr><td>Language</td><td>Java 17</td></tr>
+	<tr><td>Framework</td><td>Spring Boot, Gradle</td></tr>
+	<tr><td>ORM</td><td>Spring Data JPA</td></tr>
+	<tr><td>Authorization</td><td>Spring Security, OAuth 2.0, JWT</td></tr>
+	<tr><td>API Documentation</td><td>Swagger</td></tr>
+	<tr><td>Database</td><td>MySQL</td></tr>
+	<tr><td>Login Open API</td><td>Kakao, Apple</td></tr>
+	<tr><td>Infra</td><td>PaaS-TA on Ncloud</td></tr>
+	<tr><td>Etc</td><td>Clova Speech, ETRI</td></tr>
+</table>
+
+
+## 🐣 COOING 
 ![563739_result_rotated_001](https://github.com/COOING-team/COOING-Server/assets/94737714/7c946dcb-60fe-48fe-a84e-e33e44fef28e)
 ![563739_result_rotated_002](https://github.com/COOING-team/COOING-Server/assets/94737714/4b9f1814-2352-4e3d-9de8-9c0ea27f5293)
 ![563739_result_rotated_003](https://github.com/COOING-team/COOING-Server/assets/94737714/ea7184fa-1c37-43d5-82b7-72e3ef814a27)
